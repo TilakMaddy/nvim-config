@@ -1,5 +1,5 @@
 --[[
-
+:
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
@@ -33,7 +33,7 @@ What is Kickstart?
     or immediately breaking it into modular pieces. It's up to you!
 
     If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
+    a  guide. One possible example which will only take 10-15 minutes:
       - https://learnxinyminutes.com/docs/lua/
 
     After understanding a bit more about Lua, you can use `:help lua-guide` as a
@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.  = false
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -157,12 +157,27 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+--@Tilak ThePrimeagen Settings
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.smartindent = true
+vim.opt.expandtab = true
+vim.opt.hlsearch = false
+vim.opt.incsearch = true
+--
+-- @Tilak vim.opt.*
+vim.opt.termguicolors = true
+vim.opt.relativenumber = true
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+-- @Tilak
+vim.keymap.set('i', 'kj', '<Esc>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -255,7 +270,55 @@ require('lazy').setup({
       },
     },
   },
+  -- @Tilak (Added for rust support)
+  {
+    'mrcjkb/rustaceanvim',
+    version = '^5', -- Recommended
+    lazy = false, -- This plugin is already lazy
+  },
 
+  -- @Tilak (Added for pairing brackets)
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    config = true,
+    -- use opts = {} for passing setup options
+    -- this is equivalent to setup({}) function
+  },
+
+  --@Tilak
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = function()
+      require('toggleterm').setup {
+        -- size can be a number or function which is passed the current terminal
+        size = 20,
+        open_mapping = [[<c-\>]], -- or { [[<c-\>]], [[<c-¥>]] } if you also use a Japanese keyboard.
+        hide_numbers = true, -- hide the number column in toggleterm buffers
+        shade_filetypes = {},
+        shade_terminals = true,
+        shading_factor = 2,
+        start_in_insert = true,
+        insert_mappings = true, -- whether or not the open mapping applies in insert mode
+        persist_size = true,
+        direction = 'float',
+        close_on_exit = true, -- close the terminal window when the process exits
+        shell = vim.o.shell,
+        auto_scroll = true, -- automatically scroll to the bottom on terminal output
+        -- This field is only relevant if direction is set to 'float'
+        float_opts = {
+          -- The border key is *almost* the same as 'nvim_open_win'
+          -- see :h nvim_open_win for details on borders however
+          -- the 'curved' border is a custom border type
+          -- not natively supported but implemented in this plugin.
+          border = 'curved',
+          -- like `size`, width, height, row, and col can be a number or function which is passed the current terminal
+          winblend = 0,
+        },
+      }
+    end,
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -403,7 +466,8 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>saf', builtin.find_files, { desc = '[S]earch [A]ll [F]iles' })
+      vim.keymap.set('n', '<leader>sf', builtin.git_files, { desc = '[S]earch Git [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -452,6 +516,17 @@ require('lazy').setup({
   },
   { 'Bilal2453/luvit-meta', lazy = true },
   {
+    'tpope/vim-fugitive',
+    config = function()
+      vim.keymap.set('n', '<leader>gs', vim.cmd.Git)
+    end,
+  },
+  -- {
+  --   'pmizio/typescript-tools.nvim',
+  --   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  --   opts = {},
+  -- },
+  {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -492,6 +567,41 @@ require('lazy').setup({
       --
       -- If you're wondering about lsp vs treesitter, you can check out the wonderfully
       -- and elegantly composed help section, `:help lsp-vs-treesitter`
+
+      -- @Tilak added so that I can choose an option by pressing enter instead of <C-y>
+      local cmp = require 'cmp'
+      cmp.setup {
+        snippet = {
+          expand = function(args)
+            require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          end,
+        },
+        mapping = cmp.mapping.preset.insert {
+          ['<Tab>'] = cmp.mapping.confirm { select = true },
+          ['<C-Space>'] = cmp.mapping.complete(),
+        },
+        sources = cmp.config.sources({
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' }, -- For luasnip users.
+        }, {
+          { name = 'buffer' },
+        }),
+      }
+
+      -- @Tilak copy pasted from Lua
+      local lspconfig = require 'lspconfig'
+      local configs = require 'lspconfig.configs'
+
+      configs.solidity = {
+        default_config = {
+          cmd = { 'nomicfoundation-solidity-language-server', '--stdio' },
+          filetypes = { 'solidity' },
+          root_dir = lspconfig.util.find_git_ancestor,
+          single_file_support = true,
+        },
+      }
+
+      lspconfig.solidity.setup {}
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
@@ -839,6 +949,8 @@ require('lazy').setup({
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
+
+      --@Tilak
     end,
   },
 
@@ -929,7 +1041,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
