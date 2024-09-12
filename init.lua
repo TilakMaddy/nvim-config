@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.nerd_font  = false
+vim.g.nerd_font = false
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -121,6 +121,7 @@ end)
 -- Enable break indent
 vim.opt.breakindent = true
 
+vim.opt.swapfile = false
 -- Save undo history
 vim.opt.undofile = true
 
@@ -169,7 +170,12 @@ vim.opt.incsearch = true
 -- @Tilak vim.opt.*
 vim.opt.termguicolors = true
 vim.opt.relativenumber = true
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
+-- optionally enable 24-bit colour
+vim.opt.termguicolors = true
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 -- Clear highlights on search when pressing <Esc> in normal mode
@@ -275,6 +281,47 @@ require('lazy').setup({
     'mrcjkb/rustaceanvim',
     version = '^5', -- Recommended
     lazy = false, -- This plugin is already lazy
+  },
+
+  {
+    'nvim-tree/nvim-tree.lua',
+    version = '*',
+    lazy = false,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      local function my_on_attach(bufnr)
+        local api = require 'nvim-tree.api'
+        --
+        -- local function opts(desc)
+        --   return { desc = 'nvim-tree: ' .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        -- end
+        --
+        -- default mappings
+        api.config.mappings.default_on_attach(bufnr)
+
+        -- custom mappings
+        vim.keymap.set('n', '<leader>fj', api.tree.toggle)
+        vim.keymap.set('n', '<leader>ff', api.tree.find_file)
+      end
+      -- OR setup with some options
+      require('nvim-tree').setup {
+        on_attach = my_on_attach,
+        sort = {
+          sorter = 'case_sensitive',
+        },
+        view = {
+          width = 30,
+        },
+        renderer = {
+          group_empty = true,
+        },
+        filters = {
+          dotfiles = true,
+        },
+      }
+    end,
   },
 
   -- @Tilak (Added for pairing brackets)
@@ -602,6 +649,24 @@ require('lazy').setup({
       }
 
       lspconfig.solidity.setup {}
+
+      configs.mylsp = {
+        default_config = {
+          cmd = {
+            'cargo',
+            'run',
+            '--quiet',
+            '--manifest-path',
+            '/Users/tilakmadichetti/Documents/OpenSource/my-first-vscode-lsp/lsp_server/Cargo.toml',
+          },
+          filetypes = { 'text' },
+          root_dir = lspconfig.util.find_git_ancestor,
+          single_file_support = true,
+        },
+      }
+
+      lspconfig.mylsp.setup {}
+      lspconfig.gleam.setup {}
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
