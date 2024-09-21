@@ -187,6 +187,7 @@ vim.keymap.set('i', 'kj', '<Esc>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>pd', vim.diagnostic.open_float, { desc = 'Popup Diagnostics' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -249,6 +250,8 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+
+  'LazyVim/LazyVim',
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -283,6 +286,18 @@ require('lazy').setup({
     lazy = false, -- This plugin is already lazy
   },
 
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup {
+        filetypes = {
+          javascript = true,
+        },
+      }
+    end,
+  },
   {
     'nvim-tree/nvim-tree.lua',
     version = '*',
@@ -779,8 +794,9 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      --
+      --
       local servers = {
-        -- clangd = {},
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -792,7 +808,13 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
-
+        clangd = {
+          cmd = {
+            'clangd',
+            '--offset-encoding=utf-16',
+          },
+        },
+        ['clang-format'] = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -874,6 +896,9 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        -- I don't know which one that's why I'm adding both
+        ['c++'] = { 'clang-format' }, -- also installed above in mason keys
+        cpp = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
