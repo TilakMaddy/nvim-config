@@ -94,5 +94,14 @@ return {
         vim.keymap.set("n", "<leader>sn", function()
             builtin.find_files({ cwd = vim.fn.stdpath("config") })
         end, { desc = "[S]earch [N]eovim files" })
+
+        vim.keymap.set("n", "<leader>sF", function()
+            vim.cmd('let g:_telescope_dir = input("Directory: ", "", "dir")')
+            local dir = vim.g._telescope_dir
+            vim.g._telescope_dir = nil
+            if dir and dir ~= "" then
+                builtin.find_files({ cwd = dir, prompt_title = "Find Files in " .. dir })
+            end
+        end, { desc = "[S]earch [F]iles in directory" })
     end,
 }

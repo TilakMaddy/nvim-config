@@ -14,8 +14,7 @@ return {
             end)(),
         },
     },
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
+    ---@type table
     opts = {
         snippets = { preset = "luasnip" },
         keymap = {

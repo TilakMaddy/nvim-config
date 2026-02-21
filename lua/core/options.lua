@@ -18,6 +18,7 @@ vim.opt.smartcase = true
 vim.opt.inccommand = "split"
 
 -- Appearance
+vim.opt.wrap = false
 vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.opt.signcolumn = "yes"
