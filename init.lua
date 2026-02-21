@@ -279,10 +279,64 @@ require('lazy').setup({
       },
     },
   },
-  -- @Tilak (Added for rust support)
+  -- elixir stuff
+  {
+    'elixir-tools/elixir-tools.nvim',
+    version = '*',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      local elixir = require 'elixir'
+      local elixirls = require 'elixir.elixirls'
+
+      elixir.setup {
+        nextls = { enable = true },
+        elixirls = {
+          enable = true,
+          settings = elixirls.settings {
+            dialyzerEnabled = false,
+            enableTestLenses = false,
+          },
+          on_attach = function(client, bufnr)
+            vim.keymap.set('n', '<leader>exp', ':ElixirFromPipe<cr>', { buffer = true, noremap = true })
+            vim.keymap.set('n', '<leader>exo', ':ElixirToPipe<cr>', { buffer = true, noremap = true })
+            vim.keymap.set('v', '<leader>exm', ':ElixirExpandMacro<cr>', { buffer = true, noremap = true })
+          end,
+        },
+        projectionist = {
+          enable = true,
+        },
+      }
+    end,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+  },
+  -- tailwind-tools.lua
+  {
+    'luckasRanarison/tailwind-tools.nvim',
+    name = 'tailwind-tools',
+    build = ':UpdateRemotePlugins',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-telescope/telescope.nvim', -- optional
+      'neovim/nvim-lspconfig', -- optional
+    },
+    opts = {
+      cmp = {
+        highlight = '',
+      },
+      document_color = {
+        enabled = false, -- can be toggled by commands
+        kind = 'inline', -- "inline" | "foreground" | "background"
+        inline_symbol = '󰝤 ', -- only used in inline mode
+        debounce = 200, -- in milliseconds, only applied in insert mode
+      },
+    }, -- your configuration
+  },
+  --  @Tilak (Added for rust support)
   {
     'mrcjkb/rustaceanvim',
-    version = '^5', -- Recommended
+    version = '^6', -- Recommended
     lazy = false, -- This plugin is already lazy
   },
 
@@ -295,6 +349,15 @@ require('lazy').setup({
         filetypes = {
           javascript = true,
         },
+      }
+    end,
+  },
+  {
+    'brenoprata10/nvim-highlight-colors',
+    config = function()
+      require('nvim-highlight-colors').setup {
+        render = 'virtual',
+        enable_tailwind = false,
       }
     end,
   },
@@ -327,7 +390,7 @@ require('lazy').setup({
           sorter = 'case_sensitive',
         },
         view = {
-          width = 30,
+          width = 50,
         },
         renderer = {
           group_empty = true,
@@ -339,6 +402,11 @@ require('lazy').setup({
     end,
   },
 
+  {
+    'ellisonleao/glow.nvim',
+    config = true,
+    cmd = 'Glow',
+  },
   -- @Tilak (Added for pairing brackets)
   {
     'windwp/nvim-autopairs',
@@ -577,6 +645,7 @@ require('lazy').setup({
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
+  { 'neoclide/coc.nvim' },
   {
     'tpope/vim-fugitive',
     config = function()
@@ -658,30 +727,50 @@ require('lazy').setup({
         default_config = {
           cmd = { 'nomicfoundation-solidity-language-server', '--stdio' },
           filetypes = { 'solidity' },
-          root_dir = lspconfig.util.find_git_ancestor,
+          -- root_dir = lspconfig.util.find_git_ancestor,
+          root_dir = lspconfig.util.root_pattern('foundry.toml', '.git'),
           single_file_support = true,
         },
       }
 
       lspconfig.solidity.setup {}
 
-      configs.mylsp = {
-        default_config = {
-          cmd = {
-            'cargo',
-            'run',
-            '--quiet',
-            '--manifest-path',
-            '/Users/tilakmadichetti/Documents/OpenSource/my-first-vscode-lsp/lsp_server/Cargo.toml',
-          },
-          filetypes = { 'text' },
-          root_dir = lspconfig.util.find_git_ancestor,
-          single_file_support = true,
-        },
+      lspconfig.phpactor.setup {
+        -- init_options = {
+        --   ['language_server_phpstan.enabled'] = false,
+        --   ['language_server_psalm.enabled'] = false,
+        -- },
       }
 
-      lspconfig.mylsp.setup {}
+      -- configs.mylsp = {
+      --   default_config = {
+      --     cmd = {
+      --       'cargo',
+      --       'run',
+      --       '--quiet',
+      --       '--manifest-path',
+      --       '/Users/tilakmadichetti/Documents/OpenSource/my-first-vscode-lsp/lsp_server/Cargo.toml',
+      --     },
+      --     filetypes = { 'text' },
+      --     root_dir = lspconfig.util.find_git_ancestor,
+      --     single_file_support = true,
+      --   },
+      -- }
+
       lspconfig.gleam.setup {}
+      lspconfig.svelte.setup {}
+
+      lspconfig.gopls.setup {
+        settings = {
+          gopls = {
+            analyses = {
+              unusedparams = true,
+            },
+            staticcheck = true,
+            gofumpt = true,
+          },
+        },
+      }
 
       --  This function gets run when an LSP attaches to a particular buffer.
       --    That is to say, every time a new file is opened that is associated with
@@ -797,8 +886,9 @@ require('lazy').setup({
       --
       --
       local servers = {
-        -- gopls = {},
-        -- pyright = {},
+        gopls = {},
+        tailwindcss = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -808,13 +898,22 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        ts_ls = {
+          root_dir = require('lspconfig').util.root_pattern { 'package.json', 'tsconfig.json' },
+          single_file_support = false,
+          settings = {},
+        },
+        denols = {
+          root_dir = require('lspconfig').util.root_pattern { 'deno.json', 'deno.jsonc' },
+          single_file_support = false,
+          settings = {},
+        },
         clangd = {
           cmd = {
             'clangd',
             '--offset-encoding=utf-16',
           },
         },
-        ['clang-format'] = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
@@ -842,9 +941,6 @@ require('lazy').setup({
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-      })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
@@ -858,6 +954,8 @@ require('lazy').setup({
             require('lspconfig')[server_name].setup(server)
           end,
         },
+        ensure_installed = ensure_installed,
+        automatic_installation = true,
       }
     end,
   },
@@ -903,11 +1001,21 @@ require('lazy').setup({
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        php = { { 'pint', 'php_cs_fixer' } },
       },
     },
   },
-
+  {
+    -- Add the blade-nav.nvim plugin which provides Goto File capabilities
+    -- for Blade files.
+    'ricardoramirezr/blade-nav.nvim',
+    dependencies = {
+      'hrsh7th/nvim-cmp',
+    },
+    ft = { 'blade', 'php' },
+  },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -1090,7 +1198,29 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      -- exp
+      blade = {
+        install_info = {
+          url = 'https://github.com/EmranMR/tree-sitter-blade',
+          files = { 'src/parser.c' },
+          branch = 'main',
+        },
+        filetype = 'blade',
+      },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'go',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1156,3 +1286,25 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+vim.cmd 'hi Comment guifg=orange'
+
+local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+parser_config.blade = {
+  install_info = {
+    url = 'https://github.com/EmranMR/tree-sitter-blade',
+    files = { 'src/parser.c' },
+    branch = 'main',
+  },
+  filetype = 'blade',
+}
+
+vim.api.nvim_create_augroup('BladeFiletypeRelated', { clear = true })
+
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.blade.php',
+  group = 'BladeFiletypeRelated',
+  callback = function()
+    vim.bo.filetype = 'blade'
+  end,
+})
