@@ -2,28 +2,19 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-        { "williamboman/mason.nvim", config = true },
+        { "williamboman/mason.nvim", cmd = { "Mason", "MasonInstall" }, config = true },
         "williamboman/mason-lspconfig.nvim",
         "WhoIsSethDaniel/mason-tool-installer.nvim",
-        { "j-hui/fidget.nvim", opts = {
-            notification = {
-                window = {
-                    avoid = { "NvimTree" },
-                },
-            },
-        }},
         { "folke/lazydev.nvim", ft = "lua", opts = {
             library = {
                 { path = "luvit-meta/library", words = { "vim%.uv" } },
             },
         }},
         { "Bilal2453/luvit-meta", lazy = true },
-        "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-        -- Broadcast cmp capabilities to all LSP servers
-        local capabilities = vim.lsp.protocol.make_client_capabilities()
-        capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+        -- Broadcast blink.cmp capabilities to all LSP servers
+        local capabilities = require("blink.cmp").get_lsp_capabilities()
         vim.lsp.config("*", { capabilities = capabilities })
 
         -- LspAttach keymaps
@@ -90,11 +81,15 @@ return {
                 "deno",
                 "clangd",
                 "tailwindcss-language-server",
+                "eslint-lsp",
                 "phpactor",
                 -- Formatters
                 "stylua",
                 "clang-format",
                 "prettierd",
+                -- Linters
+                "ruff",
+                "golangci-lint",
             },
         })
 

@@ -2,36 +2,18 @@ return {
     "nvim-treesitter/nvim-treesitter",
     lazy = false,
     build = ":TSUpdate",
+    dependencies = {
+        "nvim-treesitter/nvim-treesitter-textobjects",
+    },
     config = function()
         -- Register blade filetype for treesitter
         vim.treesitter.language.register("blade", "blade")
 
-        -- Compatibility shims for plugins (telescope, etc.) that use removed
-        -- nvim-treesitter APIs (ft_to_lang, is_enabled, get_module, get_parser)
+        -- Compatibility shim for blade-nav.nvim which uses the removed get_parser API
         local parsers = require("nvim-treesitter.parsers")
-        if not parsers.ft_to_lang then
-            parsers.ft_to_lang = function(ft)
-                return vim.treesitter.language.get_lang(ft) or ft
-            end
-        end
         if not parsers.get_parser then
             parsers.get_parser = function(bufnr, lang)
                 return vim.treesitter.get_parser(bufnr, lang)
-            end
-        end
-
-        local ok, configs = pcall(require, "nvim-treesitter.configs")
-        if not ok then
-            configs = {}
-        end
-        if not configs.is_enabled then
-            configs.is_enabled = function()
-                return true
-            end
-        end
-        if not configs.get_module then
-            configs.get_module = function()
-                return { additional_vim_regex_highlighting = false }
             end
         end
 
@@ -64,5 +46,54 @@ return {
             highlight = { enable = true },
             indent = { enable = true },
         })
+
+        -- Textobjects config (standalone plugin, not via nvim-treesitter.setup)
+        require("nvim-treesitter-textobjects").setup({
+            select = { lookahead = true },
+        })
+
+        local select = require("nvim-treesitter-textobjects.select")
+        local move = require("nvim-treesitter-textobjects.move")
+        local swap = require("nvim-treesitter-textobjects.swap")
+
+        -- Select textobjects
+        local select_maps = {
+            ["af"] = "@function.outer",
+            ["if"] = "@function.inner",
+            ["ac"] = "@class.outer",
+            ["ic"] = "@class.inner",
+            ["aa"] = "@parameter.outer",
+            ["ia"] = "@parameter.inner",
+            ["al"] = "@loop.outer",
+            ["il"] = "@loop.inner",
+        }
+        for key, query in pairs(select_maps) do
+            vim.keymap.set({ "x", "o" }, key, function()
+                select.select_textobject(query)
+            end, { desc = "TS: " .. query })
+        end
+
+        -- Move to next/prev
+        local move_maps = {
+            ["]f"] = { fn = move.goto_next_start, q = "@function.outer", desc = "Next function" },
+            ["[f"] = { fn = move.goto_previous_start, q = "@function.outer", desc = "Prev function" },
+            ["]c"] = { fn = move.goto_next_start, q = "@class.outer", desc = "Next class" },
+            ["[c"] = { fn = move.goto_previous_start, q = "@class.outer", desc = "Prev class" },
+            ["]a"] = { fn = move.goto_next_start, q = "@parameter.inner", desc = "Next argument" },
+            ["[a"] = { fn = move.goto_previous_start, q = "@parameter.inner", desc = "Prev argument" },
+        }
+        for key, m in pairs(move_maps) do
+            vim.keymap.set({ "n", "x", "o" }, key, function()
+                m.fn(m.q)
+            end, { desc = m.desc })
+        end
+
+        -- Swap arguments
+        vim.keymap.set("n", "<leader>xa", function()
+            swap.swap_next("@parameter.inner")
+        end, { desc = "Swap with next argument" })
+        vim.keymap.set("n", "<leader>xA", function()
+            swap.swap_previous("@parameter.inner")
+        end, { desc = "Swap with prev argument" })
     end,
 }

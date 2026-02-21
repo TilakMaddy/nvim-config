@@ -1,5 +1,5 @@
 return {
     "ricardoramirezr/blade-nav.nvim",
-    dependencies = { "hrsh7th/nvim-cmp" },
+    dependencies = { "saghen/blink.cmp" },
     ft = { "blade", "php" },
 }

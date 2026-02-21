@@ -1,3 +1,25 @@
+local theme_file = vim.fn.stdpath("data") .. "/theme.txt"
+
+local function load_saved_theme()
+    local f = io.open(theme_file, "r")
+    if f then
+        local theme = f:read("*l")
+        f:close()
+        if theme and theme ~= "" then
+            return theme
+        end
+    end
+    return "catppuccin-mocha"
+end
+
+local function save_theme(name)
+    local f = io.open(theme_file, "w")
+    if f then
+        f:write(name)
+        f:close()
+    end
+end
+
 return {
     {
         "folke/tokyonight.nvim",
@@ -9,13 +31,27 @@ return {
             end,
         },
         init = function()
-            vim.cmd.colorscheme("catppuccin-mocha")
+            vim.cmd.colorscheme(load_saved_theme())
         end,
         keys = {
             {
                 "<leader>tt",
                 function()
-                    require("telescope.builtin").colorscheme({ enable_preview = true })
+                    require("telescope.builtin").colorscheme({
+                        enable_preview = true,
+                        attach_mappings = function(_, map)
+                            map("i", "<CR>", function(prompt_bufnr)
+                                local selection = require("telescope.actions.state").get_selected_entry()
+                                require("telescope.actions").close(prompt_bufnr)
+                                if selection then
+                                    vim.cmd.colorscheme(selection.value)
+                                    save_theme(selection.value)
+                                    vim.notify("Theme saved: " .. selection.value)
+                                end
+                            end)
+                            return true
+                        end,
+                    })
                 end,
                 desc = "[T]oggle [T]heme (picker)",
             },
@@ -27,12 +63,6 @@ return {
         opts = {
             no_italic = true,
         },
-    },
-    {
-        "projekt0n/github-nvim-theme",
-        config = function()
-            require("github-theme").setup({})
-        end,
     },
     {
         "rose-pine/neovim",
