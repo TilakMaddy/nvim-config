@@ -1,318 +1,333 @@
-# Neovim Configuration Documentation
+# Neovim Configuration
 
-## Overview
+A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim), managed by [lazy.nvim](https://github.com/folke/lazy.nvim).
 
-This is a personalized Neovim configuration built on top of
-[kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim). It uses
-[lazy.nvim](https://github.com/folke/lazy.nvim) as its plugin manager and is
-designed around a few core principles:
+**Leader key: Space**
 
-- **Heavy LSP integration** -- Language Server Protocol support for 10+
-  languages via Mason with auto-installation of servers, formatters, and
-  linters.
-- **AI-assisted coding** -- Avante.nvim provides an in-editor AI chat sidebar
-  powered by Claude (via OpenRouter).
-- **Polyglot language support** -- First-class configurations for Lua, Go,
-  Python, TypeScript, JavaScript, Rust, C/C++, Elixir, PHP/Blade, Svelte,
-  Gleam, Solidity, and Deno.
-- **Telescope-centric workflow** -- Fuzzy finding for files, grep, symbols,
-  diagnostics, buffers, and more.
-- **Performance-conscious** -- Lazy-loaded plugins, disabled built-in plugins,
-  disabled unused providers, and Treesitter-based highlighting.
+## What's in it
 
-The leader key is **Space**.
+- **15+ language servers** auto-installed via Mason (Go, Python, TypeScript, Rust, C/C++, Elixir, PHP, Lua, Deno, Svelte, Gleam, Solidity, Tailwind, ESLint)
+- **AI coding** with Avante.nvim (Claude via OpenRouter)
+- **Fuzzy everything** through Telescope with FZF-native sorting
+- **Fast completion** via blink.cmp (Rust-powered) with LSP, snippets, path, and buffer sources
+- **Format on save** with conform.nvim, **lint on save** with nvim-lint
+- **5 bundled themes** with persistent selection (tokyonight, catppuccin, rose-pine, kanagawa, everforest)
+- **File navigation** four ways: nvim-tree, Grapple tagging, Oil buffer editing, Telescope
+- **Flash.nvim** for label-based cursor jumping
+- **Treesitter** syntax, textobjects, and structural navigation
+- **Floating terminal**, **Lazygit**, and **notification system** via snacks.nvim
+- **In-editor images** via Kitty protocol + ImageMagick
 
 ---
 
-## Prerequisites
+## Requirements
 
-### Required
+| Required | Purpose |
+|---|---|
+| Neovim 0.10+ | Native `vim.lsp.config`, `after/lsp/` support |
+| Nerd Font | Icons everywhere |
+| git | Plugins, Grapple scope |
+| make | telescope-fzf-native, LuaSnip, Avante builds |
+| ripgrep (`rg`) | Telescope live grep, todo-comments |
+| npm / Node.js | Markdown preview, some LSP servers |
 
-| Dependency        | Minimum Version | Purpose                                    |
-|-------------------|-----------------|--------------------------------------------|
-| **Neovim**        | 0.10+           | Editor (uses native LSP config via `vim.lsp.config`) |
-| **Nerd Font**     | any             | Icons in statusline, file tree, and UI     |
-| **git**           | any             | Plugin installation, Grapple git scope     |
-| **make**          | any             | Building telescope-fzf-native, LuaSnip, Avante |
-| **npm / Node.js** | any             | Markdown preview, some LSP servers         |
-| **ripgrep** (`rg`)| any             | Telescope live grep, todo-comments         |
-
-### Optional
-
-| Dependency        | Purpose                                              |
-|-------------------|------------------------------------------------------|
-| **ImageMagick**   | SVG-to-PNG conversion for in-editor image rendering  |
-| **Kitty terminal**| Kitty graphics protocol backend for image.nvim       |
-| **Lazygit**       | Terminal UI for git, launched via `<leader>gg`        |
-| **fd**            | Faster file finding for Telescope (auto-detected)    |
+| Optional | Purpose |
+|---|---|
+| Lazygit | Git UI via `<leader>gg` |
+| fd | Faster file finding for Telescope |
+| ImageMagick | SVG rendering in-editor |
+| Kitty terminal | Image protocol backend |
 
 ---
 
-## Directory Structure
+## Directory Layout
 
 ```
 ~/.config/nvim/
-|-- init.lua                        Bootstrap: leader key, core modules, lazy.nvim
-|-- lua/
-|   |-- core/
-|   |   |-- options.lua             Vim options (numbers, tabs, search, appearance)
-|   |   |-- keymaps.lua             Core keybindings (escape, window nav, diagnostics)
-|   |   |-- autocmds.lua            Autocommands (yank highlight, blade filetype)
-|   |-- plugins/
-|       |-- avante.lua              AI assistant (Avante.nvim + OpenRouter)
-|       |-- colorscheme.lua         Themes: tokyonight, catppuccin, rose-pine, kanagawa, everforest
-|       |-- completion.lua          Completion engine (blink.cmp + LuaSnip)
-|       |-- editor.lua              which-key, autopairs, todo-comments, highlight-colors
-|       |-- flash.lua               Flash.nvim jump/motion
-|       |-- formatting.lua          conform.nvim (format on save)
-|       |-- git.lua                 gitsigns + vim-fugitive
-|       |-- image.lua               In-editor image rendering (kitty backend)
-|       |-- lang-elixir.lua         Elixir language tooling (elixir-tools.nvim)
-|       |-- lang-php.lua            PHP/Blade navigation (blade-nav.nvim)
-|       |-- lang-rust.lua           Rust tooling (rustaceanvim)
-|       |-- linting.lua             nvim-lint (ruff for Python, golangci-lint for Go)
-|       |-- lsp.lua                 LSP config, Mason, mason-tool-installer
-|       |-- markdown-preview.lua    Browser-based markdown preview
-|       |-- mini.lua                mini.ai, mini.surround, mini.statusline
-|       |-- navigation.lua          nvim-tree file explorer + Grapple file tagging
-|       |-- oil.lua                 Oil.nvim (buffer-based file manager)
-|       |-- snacks.lua              snacks.nvim (notifier, lazygit, terminal, bigfile)
-|       |-- telescope.lua           Telescope fuzzy finder + fzf-native
-|       |-- treesitter.lua          Treesitter (syntax, textobjects, indent)
-|       |-- undotree.lua            Undo history visualizer
-|-- after/
-|   |-- lsp/
-|       |-- clangd.lua              C/C++ LSP settings (UTF-16 offset encoding)
-|       |-- denols.lua              Deno LSP settings
-|       |-- gleam.lua               Gleam LSP settings
-|       |-- gopls.lua               Go LSP settings (staticcheck, gofumpt)
-|       |-- lua_ls.lua              Lua LSP settings (call snippets)
-|       |-- phpactor.lua            PHP LSP settings
-|       |-- pyright.lua             Python LSP settings
-|       |-- solidity.lua            Solidity LSP settings
-|       |-- svelte.lua              Svelte LSP settings
-|       |-- ts_ls.lua               TypeScript LSP settings (root markers, no SFS)
-|-- doc/
-|   |-- kickstart.txt               Upstream kickstart help file
+├── init.lua                     Entry point: leader key, core modules, lazy.nvim bootstrap
+├── lua/
+│   ├── core/
+│   │   ├── options.lua          Editor settings (4-space tabs, relative numbers, no wrap, etc.)
+│   │   ├── keymaps.lua          Core bindings (kj escape, window nav, diagnostics)
+│   │   └── autocmds.lua         Yank highlight, .blade.php filetype detection
+│   └── plugins/
+│       ├── lsp.lua              LSP + Mason + mason-tool-installer pipeline
+│       ├── completion.lua       blink.cmp + LuaSnip
+│       ├── treesitter.lua       Syntax, textobjects, indent
+│       ├── telescope.lua        Fuzzy finder + fzf-native
+│       ├── colorscheme.lua      5 themes + persistent picker
+│       ├── formatting.lua       conform.nvim (format on save)
+│       ├── linting.lua          nvim-lint (ruff, golangci-lint)
+│       ├── navigation.lua       nvim-tree + Grapple
+│       ├── git.lua              gitsigns + vim-fugitive
+│       ├── editor.lua           which-key, autopairs, todo-comments, color highlights
+│       ├── snacks.lua           Notifier, terminal, Lazygit, bigfile
+│       ├── mini.lua             mini.ai, mini.surround, mini.statusline
+│       ├── flash.lua            Label-based motion
+│       ├── oil.lua              Buffer-based file manager
+│       ├── undotree.lua         Undo history visualizer
+│       ├── avante.lua           AI assistant (Claude via OpenRouter)
+│       ├── image.lua            In-editor image rendering
+│       ├── markdown-preview.lua Browser-based markdown preview
+│       ├── lang-rust.lua        rustaceanvim
+│       ├── lang-elixir.lua      elixir-tools.nvim
+│       └── lang-php.lua         blade-nav.nvim
+├── after/lsp/                   Per-server LSP settings (auto-merged by Neovim 0.10+)
+│   ├── lua_ls.lua               Call snippet replacement
+│   ├── gopls.lua                gofumpt, staticcheck, unused params
+│   ├── ts_ls.lua                Root markers: package.json, tsconfig.json
+│   ├── denols.lua               Root markers: deno.json, deno.jsonc
+│   ├── clangd.lua               UTF-16 offset encoding
+│   ├── solidity.lua             Hardhat/Foundry support
+│   ├── pyright.lua
+│   ├── phpactor.lua
+│   ├── svelte.lua
+│   └── gleam.lua
+└── doc/
+    └── kickstart.txt            Upstream help file
 ```
 
 ---
 
-## Architecture
+## How It Works
 
-### Startup Sequence
+```
+init.lua
+  │
+  ├─ vim.g.mapleader = " "
+  ├─ require("core.options")       ← editor settings
+  ├─ require("core.keymaps")       ← core bindings
+  ├─ require("core.autocmds")      ← autocommands
+  │
+  └─ require("lazy").setup({
+       spec = { import = "plugins" }   ← auto-discovers lua/plugins/*.lua
+     })
+       │
+       └─ lazy.nvim installs, resolves dependencies, applies lazy-loading
+            │
+            └─ Neovim 0.10+ loads after/lsp/*.lua for per-server config
+```
 
-1. **`init.lua`** runs first. It:
-   - Sets the leader key to **Space** (`vim.g.mapleader = " "`).
-   - Sets `vim.g.nerd_font = true` so plugins can use Nerd Font icons.
-   - Loads the three core modules in order: `core.options`, `core.keymaps`,
-     `core.autocmds`.
-   - Bootstraps lazy.nvim by cloning it into `~/.local/share/nvim/lazy/` if it
-     is not already present.
-   - Calls `require("lazy").setup()` with `{ import = "plugins" }`, which
-     tells lazy.nvim to auto-discover and load every `*.lua` file inside
-     `lua/plugins/`.
-
-2. **lazy.nvim** reads all plugin specs from `lua/plugins/`, resolves
-   dependencies, installs missing plugins, and applies lazy-loading rules
-   (`event`, `cmd`, `ft`, `keys`).
-
-3. **Neovim's native LSP** (0.10+) picks up files in `after/lsp/` to
-   configure individual language servers. Each file returns a table of settings
-   that is automatically merged into that server's config by
-   `vim.lsp.config()`.
-
-### Key Design Decisions
-
-- **No netrw.** The built-in file explorer is disabled in `options.lua`
-  (`vim.g.loaded_netrw = 1`). nvim-tree and Oil are used instead.
-- **No external providers.** Python, Ruby, Perl, and Node providers are all
-  disabled for faster startup.
-- **Performance tuning.** Seven built-in plugins are disabled via
-  `disabled_plugins` in lazy.nvim's performance settings (gzip, matchit,
-  matchparen, tarPlugin, tohtml, tutor, zipPlugin). Lazy.nvim's cache is
-  enabled.
-- **System clipboard.** The clipboard is set to `unnamedplus` via
-  `vim.schedule()` to avoid blocking startup.
-- **Persistent undo.** Swap files are disabled but undo files are enabled,
-  giving persistent undo history across sessions. Undotree provides a visual
-  browser for this history.
-- **Persistent theme.** The selected colorscheme is saved to
-  `~/.local/share/nvim/theme.txt` and restored on startup.
-
-### Core Options Summary
-
-| Category      | Settings                                                      |
-|---------------|---------------------------------------------------------------|
-| Line numbers  | Absolute + relative                                           |
-| Indentation   | 4 spaces, expandtab, smart indent, break indent               |
-| Search        | Incremental, case-insensitive with smart-case, no hlsearch    |
-| Appearance    | No line wrap, true colors, cursorline, sign column always on   |
-| Splits        | Open right and below                                          |
-| Timing        | 250ms updatetime, 300ms timeoutlen                            |
-| Whitespace    | Visible tabs (`>>` ), trailing spaces (`*`), nbsp             |
+**Key decisions:**
+- netrw disabled -- nvim-tree and Oil replace it
+- Python/Ruby/Perl/Node providers disabled -- faster startup
+- 7 built-in plugins disabled (gzip, matchit, matchparen, tarPlugin, tohtml, tutor, zipPlugin)
+- Swap files off, persistent undo on (`undofile = true`)
+- System clipboard via `vim.schedule` to avoid blocking startup
+- Theme persisted to `~/.local/share/nvim/theme.txt`
 
 ---
 
-## Index of Documentation
+## Key Bindings at a Glance
 
-| Document                        | Description                                     |
-|---------------------------------|-------------------------------------------------|
-| [keymaps.md](keymaps.md)        | Complete keybinding reference for all modes      |
-| [lsp.md](lsp.md)               | LSP servers, completion, formatting, and linting |
-| [plugins.md](plugins.md)        | Full plugin list with configuration details      |
-| [navigation.md](navigation.md)  | File navigation, Telescope, tree, Oil, Grapple   |
-| [ui.md](ui.md)                  | Themes, statusline, notifications, UI elements   |
-| [languages.md](languages.md)    | Language-specific setups and per-language notes   |
+### General
+
+| Key | Action |
+|---|---|
+| `kj` | Escape insert mode |
+| `<Esc>` | Clear search highlights |
+| `<C-h/j/k/l>` | Navigate windows |
+| `<C-\>` | Toggle floating terminal |
+| `<leader>q` | Diagnostics quickfix |
+| `<leader>pd` | Popup diagnostics |
+
+### Search (Telescope)
+
+| Key | Action |
+|---|---|
+| `<leader>sf` | Git files |
+| `<leader>saf` | All files |
+| `<leader>sg` | Live grep |
+| `<leader>sG` | Live grep (include hidden/ignored) |
+| `<leader>sD` | Grep in specific directory |
+| `<leader>sw` | Grep current word |
+| `<leader>sd` | Diagnostics |
+| `<leader>sh` | Help tags |
+| `<leader>sk` | Keymaps |
+| `<leader>sr` | Resume last search |
+| `<leader>s.` | Recent files |
+| `<leader>sn` | Neovim config files |
+| `<leader>sF` | Files in directory |
+| `<leader>s/` | Grep in open files |
+| `<leader>/` | Fuzzy find in current buffer |
+| `<leader><leader>` | Open buffers |
+
+### LSP (active when server attached)
+
+| Key | Action |
+|---|---|
+| `gd` | Go to definition |
+| `gr` | Go to references |
+| `gI` | Go to implementation |
+| `gD` | Go to declaration |
+| `<leader>D` | Type definition |
+| `<leader>ds` | Document symbols |
+| `<leader>ws` | Workspace symbols |
+| `<leader>rn` | Rename |
+| `<leader>ca` | Code action |
+| `<leader>th` | Toggle inlay hints |
+| `<leader>f` | Format buffer |
+
+### Navigation
+
+| Key | Action |
+|---|---|
+| `<leader>fj` | Toggle nvim-tree |
+| `<leader>ff` | Find current file in tree |
+| `<leader>ha` | Grapple: toggle tag |
+| `<leader>hf` | Grapple: view tags |
+| `<C-n>` / `<C-p>` | Grapple: cycle tags |
+| `-` | Oil: open parent directory |
+| `s` | Flash jump |
+| `S` | Flash treesitter jump |
+
+### Git & AI
+
+| Key | Action |
+|---|---|
+| `<leader>gs` | Git status (Fugitive) |
+| `<leader>gg` | Lazygit |
+| `<leader>aa` | Avante: toggle AI sidebar |
+| `<leader>an` | Avante: new chat |
+| `<leader>am` | Avante: switch model |
+
+### UI
+
+| Key | Action |
+|---|---|
+| `<leader>tt` | Theme picker (persistent) |
+| `<leader>u` | Toggle undotree |
+| `<leader>nh` | Notification history |
+| `<leader>mp` | Markdown preview |
+
+> Full reference: [keymaps.md](keymaps.md)
+
+---
+
+## Mason Auto-Installed Tools
+
+| Category | Tools |
+|---|---|
+| LSP servers | lua-language-server, gopls, pyright, typescript-language-server, deno, clangd, tailwindcss-language-server, eslint-lsp, phpactor |
+| Formatters | stylua, clang-format, prettierd |
+| Linters | ruff, golangci-lint |
+
+Servers **not** managed by Mason: `rust_analyzer` (managed by rustaceanvim), `elixirls`/`nextls` (managed by elixir-tools.nvim), `gleam` (bundled with compiler).
+
+---
+
+## Completion
+
+blink.cmp (Rust-powered) with LuaSnip snippets:
+
+| Key | Action |
+|---|---|
+| `<C-n>` / `<C-p>` | Next / previous item |
+| `<Tab>` / `<C-y>` | Accept |
+| `<C-Space>` | Show completions |
+| `<C-e>` | Hide |
+| `<C-l>` / `<C-h>` | Snippet forward / backward |
+| `<C-b>` / `<C-f>` | Scroll docs |
+
+Sources: LSP, snippets, path, buffer. Extra: `lazydev` for Lua, `blade-nav` for PHP/Blade.
+
+---
+
+## Formatting & Linting
+
+**Format on save** via conform.nvim (disabled for C/C++):
+
+| Filetype | Formatter |
+|---|---|
+| Lua | stylua |
+| C/C++ | clang-format (manual only) |
+| JS/TS | prettierd (fallback: prettier) |
+| PHP | pint (fallback: php_cs_fixer) |
+
+**Lint on save** via nvim-lint:
+
+| Filetype | Linter |
+|---|---|
+| Python | ruff |
+| Go | golangci-lint |
 
 ---
 
 ## Quick Start
 
-### 1. Clone the repository
-
 ```bash
-git clone <your-repo-url> ~/.config/nvim
-```
-
-If you already have a Neovim config, back it up first:
-
-```bash
+# Back up existing config
 mv ~/.config/nvim ~/.config/nvim.bak
 mv ~/.local/share/nvim ~/.local/share/nvim.bak
-mv ~/.local/state/nvim ~/.local/state/nvim.bak
-mv ~/.cache/nvim ~/.cache/nvim.bak
-```
 
-### 2. Open Neovim
+# Clone
+git clone <your-repo-url> ~/.config/nvim
 
-```bash
+# Launch -- lazy.nvim installs everything automatically
 nvim
 ```
 
-On first launch, lazy.nvim will automatically clone itself and install all
-plugins. You will see a progress window. Wait for it to finish.
-
-### 3. Install Treesitter parsers
-
-Treesitter grammars are installed automatically via `ensure_installed`, but you
-can trigger a manual update with:
-
-```vim
-:TSUpdate
-```
-
-### 4. Install LSP servers and tools
-
-Mason will auto-install the tools listed in `mason-tool-installer`. To manage
-them manually or install additional servers:
-
-```vim
-:Mason
-```
-
-The following are installed automatically:
-
-**LSP servers:** lua-language-server, gopls, pyright, typescript-language-server,
-deno, clangd, tailwindcss-language-server, eslint-lsp, phpactor
-
-**Formatters:** stylua, clang-format, prettierd
-
-**Linters:** ruff, golangci-lint
-
-### 5. AI setup (optional)
-
-Avante is configured to use OpenRouter with an API key read from your
-`~/.zshrc`. Ensure you have the following line in your shell config:
-
-```bash
-export OPENROUTER_API_KEY="your-key-here"
-```
+After first launch:
+1. Wait for the lazy.nvim install window to finish
+2. Run `:Mason` to verify LSP servers are installed
+3. (Optional) Set `OPENROUTER_API_KEY` in `~/.zshrc` for Avante AI
 
 ---
 
 ## Customization
 
-### Adding a new plugin
+### Add a plugin
 
-Create a new file in `lua/plugins/`. lazy.nvim will automatically pick it up.
-The file must return a table (or a list of tables) following the lazy.nvim
-plugin spec format:
+Create a file in `lua/plugins/`:
 
 ```lua
 -- lua/plugins/my-plugin.lua
 return {
-    "author/plugin-name",
-    event = "VeryLazy",  -- lazy-loading trigger
-    opts = {
-        -- plugin options
-    },
+  "author/plugin-name",
+  event = "VeryLazy",
+  opts = {},
 }
 ```
 
-### Adding or configuring an LSP server
+### Add a language server
 
-1. If the server is available via Mason, add it to the `ensure_installed` list
-   in `lua/plugins/lsp.lua`.
-
-2. Create a file in `after/lsp/` named after the server (e.g.,
-   `after/lsp/rust_analyzer.lua`). The file should return a table of settings:
+1. Add the Mason package name to `ensure_installed` in `lua/plugins/lsp.lua`
+2. Create `after/lsp/<server>.lua` returning a settings table:
 
 ```lua
 -- after/lsp/rust_analyzer.lua
 return {
-    settings = {
-        ["rust-analyzer"] = {
-            checkOnSave = {
-                command = "clippy",
-            },
-        },
+  settings = {
+    ["rust-analyzer"] = {
+      checkOnSave = { command = "clippy" },
     },
+  },
 }
 ```
 
-Neovim 0.10+ will automatically merge these settings when the server starts.
-Note that `mason-lspconfig` with `automatic_enable` handles starting servers
-for you -- no explicit `lspconfig[server].setup()` call is needed.
+### Add a formatter
 
-### Adding a formatter
-
-Add the formatter tool name to `ensure_installed` in `lua/plugins/lsp.lua`,
-then add a filetype mapping in `lua/plugins/formatting.lua`:
+Add to `ensure_installed` in `lsp.lua`, then map in `lua/plugins/formatting.lua`:
 
 ```lua
 formatters_by_ft = {
-    -- existing entries...
-    ruby = { "rubocop" },
-},
-```
-
-### Adding a linter
-
-Add the linter tool name to `ensure_installed` in `lua/plugins/lsp.lua`, then
-add a filetype mapping in `lua/plugins/linting.lua`:
-
-```lua
-lint.linters_by_ft = {
-    -- existing entries...
-    ruby = { "rubocop" },
+  ruby = { "rubocop" },
 }
 ```
 
-### Changing the colorscheme
+### Change the theme
 
-Press `<leader>tt` to open the theme picker with live preview. The selected
-theme is persisted across sessions. The following themes are bundled:
+Press `<leader>tt` -- picks with live preview, persists across sessions.
 
-- **tokyonight** (night variant, default comments in orange)
-- **catppuccin** (mocha, macchiato, frappe, latte)
-- **rose-pine** (main, moon, dawn)
-- **kanagawa** (wave, dragon, lotus)
-- **everforest**
+---
 
-### Changing keybindings
+## Detailed Documentation
 
-Core keybindings live in `lua/core/keymaps.lua`. Plugin-specific keybindings
-are defined in each plugin's spec file (in the `keys` table), which also
-controls lazy-loading. Press `<leader>sk` to search all keymaps via Telescope,
-or press the leader key and wait for which-key to show available continuations.
+| Document | What it covers |
+|---|---|
+| [keymaps.md](keymaps.md) | Every keybinding across all plugins |
+| [lsp.md](lsp.md) | LSP servers, completion, formatting, linting |
+| [plugins.md](plugins.md) | All ~40 plugins with config details |
+| [navigation.md](navigation.md) | Telescope, nvim-tree, Grapple, Oil, Flash |
+| [ui.md](ui.md) | Themes, statusline, notifications, terminal |
+| [languages.md](languages.md) | Per-language setup for all 14 supported languages |
