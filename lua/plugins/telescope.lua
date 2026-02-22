@@ -7,7 +7,7 @@ return {
             "nvim-telescope/telescope-fzf-native.nvim",
             build = "make",
             cond = function()
-                return vim.fn.executable("make") == 1
+                return vim.fn.executable "make" == 1
             end,
         },
         { "nvim-tree/nvim-web-devicons", enabled = vim.g.nerd_font },
@@ -20,26 +20,40 @@ return {
         { "<leader>ss", "<cmd>Telescope builtin<cr>", desc = "[S]earch [S]elect Telescope" },
         { "<leader>sw", "<cmd>Telescope grep_string<cr>", desc = "[S]earch current [W]ord" },
         { "<leader>sg", "<cmd>Telescope live_grep<cr>", desc = "[S]earch by [G]rep" },
-        { "<leader>sG", function() require("telescope.builtin").live_grep({ additional_args = { "--no-ignore", "--hidden" } }) end, desc = "[S]earch by Grep (include ignored/hidden)" },
-        { "<leader>sD", function()
-            vim.ui.input({ prompt = "Directory: " }, function(dir)
-                if dir and dir ~= "" then
-                    require("telescope.builtin").live_grep({ search_dirs = { dir } })
-                end
-            end)
-        end, desc = "[S]earch [D]irectory (scoped grep)" },
-        { "<leader>sd", function()
-            require("telescope.builtin").diagnostics({
-                layout_strategy = "vertical",
-                layout_config = { width = 0.95, height = 0.95, preview_height = 0.4 },
-            })
-        end, desc = "[S]earch [D]iagnostics" },
+        {
+            "<leader>sG",
+            function()
+                require("telescope.builtin").live_grep { additional_args = { "--no-ignore", "--hidden" } }
+            end,
+            desc = "[S]earch by Grep (include ignored/hidden)",
+        },
+        {
+            "<leader>sD",
+            function()
+                vim.ui.input({ prompt = "Directory: " }, function(dir)
+                    if dir and dir ~= "" then
+                        require("telescope.builtin").live_grep { search_dirs = { dir } }
+                    end
+                end)
+            end,
+            desc = "[S]earch [D]irectory (scoped grep)",
+        },
+        {
+            "<leader>sd",
+            function()
+                require("telescope.builtin").diagnostics {
+                    layout_strategy = "vertical",
+                    layout_config = { width = 0.95, height = 0.95, preview_height = 0.4 },
+                }
+            end,
+            desc = "[S]earch [D]iagnostics",
+        },
         { "<leader>sr", "<cmd>Telescope resume<cr>", desc = "[S]earch [R]esume" },
         { "<leader>s.", "<cmd>Telescope oldfiles<cr>", desc = '[S]earch Recent Files ("." for repeat)' },
         { "<leader><leader>", "<cmd>Telescope buffers<cr>", desc = "[ ] Find existing buffers" },
     },
     config = function()
-        require("telescope").setup({
+        require("telescope").setup {
             defaults = {
                 -- Performance: use fd and ripgrep, skip heavy files
                 file_ignore_patterns = {
@@ -72,35 +86,35 @@ return {
                     case_mode = "smart_case",
                 },
             },
-        })
+        }
 
         pcall(require("telescope").load_extension, "fzf")
         -- These keymaps need function wrappers so they stay here
-        local builtin = require("telescope.builtin")
+        local builtin = require "telescope.builtin"
         vim.keymap.set("n", "<leader>/", function()
-            builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+            builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
                 winblend = 10,
                 previewer = false,
-            }))
+            })
         end, { desc = "[/] Fuzzily search in current buffer" })
 
         vim.keymap.set("n", "<leader>s/", function()
-            builtin.live_grep({
+            builtin.live_grep {
                 grep_open_files = true,
                 prompt_title = "Live Grep in Open Files",
-            })
+            }
         end, { desc = "[S]earch [/] in Open Files" })
 
         vim.keymap.set("n", "<leader>sn", function()
-            builtin.find_files({ cwd = vim.fn.stdpath("config") })
+            builtin.find_files { cwd = vim.fn.stdpath "config" }
         end, { desc = "[S]earch [N]eovim files" })
 
         vim.keymap.set("n", "<leader>sF", function()
-            vim.cmd('let g:_telescope_dir = input("Directory: ", "", "dir")')
+            vim.cmd 'let g:_telescope_dir = input("Directory: ", "", "dir")'
             local dir = vim.g._telescope_dir
             vim.g._telescope_dir = nil
             if dir and dir ~= "" then
-                builtin.find_files({ cwd = dir, prompt_title = "Find Files in " .. dir })
+                builtin.find_files { cwd = dir, prompt_title = "Find Files in " .. dir }
             end
         end, { desc = "[S]earch [F]iles in directory" })
     end,

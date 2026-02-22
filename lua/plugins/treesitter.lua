@@ -10,14 +10,14 @@ return {
         vim.treesitter.language.register("blade", "blade")
 
         -- Compatibility shim for blade-nav.nvim which uses the removed get_parser API
-        local parsers = require("nvim-treesitter.parsers")
+        local parsers = require "nvim-treesitter.parsers"
         if not parsers.get_parser then
             parsers.get_parser = function(bufnr, lang)
                 return vim.treesitter.get_parser(bufnr, lang)
             end
         end
 
-        require("nvim-treesitter").setup({
+        require("nvim-treesitter").setup {
             ensure_installed = {
                 "bash",
                 "c",
@@ -45,16 +45,16 @@ return {
             auto_install = true,
             highlight = { enable = true },
             indent = { enable = true },
-        })
+        }
 
         -- Textobjects config (standalone plugin, not via nvim-treesitter.setup)
-        require("nvim-treesitter-textobjects").setup({
+        require("nvim-treesitter-textobjects").setup {
             select = { lookahead = true },
-        })
+        }
 
-        local select = require("nvim-treesitter-textobjects.select")
-        local move = require("nvim-treesitter-textobjects.move")
-        local swap = require("nvim-treesitter-textobjects.swap")
+        local select = require "nvim-treesitter-textobjects.select"
+        local move = require "nvim-treesitter-textobjects.move"
+        local swap = require "nvim-treesitter-textobjects.swap"
 
         -- Select textobjects
         local select_maps = {
@@ -90,10 +90,10 @@ return {
 
         -- Swap arguments
         vim.keymap.set("n", "<leader>xa", function()
-            swap.swap_next("@parameter.inner")
+            swap.swap_next "@parameter.inner"
         end, { desc = "Swap with next argument" })
         vim.keymap.set("n", "<leader>xA", function()
-            swap.swap_previous("@parameter.inner")
+            swap.swap_previous "@parameter.inner"
         end, { desc = "Swap with prev argument" })
     end,
 }

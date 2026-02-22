@@ -5,11 +5,15 @@ return {
         { "williamboman/mason.nvim", cmd = { "Mason", "MasonInstall" }, config = true },
         "williamboman/mason-lspconfig.nvim",
         "WhoIsSethDaniel/mason-tool-installer.nvim",
-        { "folke/lazydev.nvim", ft = "lua", opts = {
-            library = {
-                { path = "luvit-meta/library", words = { "vim%.uv" } },
+        {
+            "folke/lazydev.nvim",
+            ft = "lua",
+            opts = {
+                library = {
+                    { path = "luvit-meta/library", words = { "vim%.uv" } },
+                },
             },
-        }},
+        },
         { "Bilal2453/luvit-meta", lazy = true },
     },
     config = function()
@@ -54,7 +58,7 @@ return {
                         group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
                         callback = function(event2)
                             vim.lsp.buf.clear_references()
-                            vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = event2.buf })
+                            vim.api.nvim_clear_autocmds { group = "lsp-highlight", buffer = event2.buf }
                         end,
                     })
                 end
@@ -62,7 +66,7 @@ return {
                 -- Toggle inlay hints
                 if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
                     map("<leader>th", function()
-                        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
+                        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
                     end, "[T]oggle Inlay [H]ints")
                 end
             end,
@@ -71,7 +75,7 @@ return {
         -- Mason setup
         require("mason").setup()
 
-        require("mason-tool-installer").setup({
+        require("mason-tool-installer").setup {
             ensure_installed = {
                 -- LSP servers
                 "lua-language-server",
@@ -91,12 +95,12 @@ return {
                 "ruff",
                 "golangci-lint",
             },
-        })
+        }
 
-        require("mason-lspconfig").setup({
+        require("mason-lspconfig").setup {
             automatic_enable = {
                 exclude = { "rust_analyzer", "rescriptls", "stylua_lsp" },
             },
-        })
+        }
     end,
 }

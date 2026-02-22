@@ -1,9 +1,9 @@
-local theme_file = vim.fn.stdpath("data") .. "/theme.txt"
+local theme_file = vim.fn.stdpath "data" .. "/theme.txt"
 
 local function load_saved_theme()
     local f = io.open(theme_file, "r")
     if f then
-        local theme = f:read("*l")
+        local theme = f:read "*l"
         f:close()
         if theme and theme ~= "" then
             return theme
@@ -37,7 +37,7 @@ return {
             {
                 "<leader>tt",
                 function()
-                    require("telescope.builtin").colorscheme({
+                    require("telescope.builtin").colorscheme {
                         enable_preview = true,
                         attach_mappings = function(_, map)
                             map("i", "<CR>", function(prompt_bufnr)
@@ -51,7 +51,7 @@ return {
                             end)
                             return true
                         end,
-                    })
+                    }
                 end,
                 desc = "[T]oggle [T]heme (picker)",
             },

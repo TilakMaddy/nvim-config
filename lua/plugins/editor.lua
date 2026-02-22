@@ -14,6 +14,7 @@ return {
                 { "<leader>s", group = "[S]earch" },
                 { "<leader>w", group = "[W]orkspace" },
                 { "<leader>t", group = "[T]oggle" },
+                { "<leader>a", group = "[A]I", mode = { "n", "v" } },
                 { "<leader>h", group = "[G]rapple", mode = { "n", "v" } },
             },
         },

@@ -23,7 +23,7 @@ return {
         vim.api.nvim_create_autocmd("BufReadCmd", {
             pattern = { "*.svg", "*.svgz" },
             callback = function(args)
-                local svg_path = vim.fn.expand("%:p")
+                local svg_path = vim.fn.expand "%:p"
                 local tmp_png = vim.fn.tempname() .. ".png"
                 local cmd = string.format("magick '%s' -density 300 -background none '%s'", svg_path, tmp_png)
                 local result = vim.fn.system(cmd)
