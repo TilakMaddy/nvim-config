@@ -205,6 +205,7 @@ opts = {
         { "<leader>w", group = "[W]orkspace" },
         { "<leader>t", group = "[T]oggle" },
         { "<leader>h", group = "[G]rapple", mode = { "n", "v" } },
+        { "<leader>a", group = "[A]I", mode = { "n", "v" } },
     },
 },
 ```
@@ -220,6 +221,7 @@ opts = {
 | `<leader>w` | Workspace | Normal | Workspace / project operations |
 | `<leader>t` | Toggle | Normal | Toggle features (theme, etc.) |
 | `<leader>h` | Grapple | Normal, Visual | Grapple file tagging / navigation |
+| `<leader>a` | AI | Normal, Visual | opencode AI assistant |
 
 Icons are enabled when `vim.g.nerd_font` is `true`. The `keys` table is left empty, meaning default key icons are used.
 

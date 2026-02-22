@@ -8,9 +8,9 @@ return {
                 snacks = {
                     win = {
                         position = "float",
-                        border = "rounded",
-                        width = 0.95,
-                        height = 0.95,
+                        border = "none",
+                        width = 0,
+                        height = 0,
                         enter = true,
                         backdrop = 100,
                     },
@@ -19,17 +19,17 @@ return {
         }
     end,
     config = function()
-        local cfg = require("opencode.config")
-        cfg.opts.provider.snacks.win =
-            vim.tbl_deep_extend("force", cfg.opts.provider.snacks.win, {
-                position = "float",
-                border = "rounded",
-                width = 0.95,
-                height = 0.95,
-                enter = true,
-                backdrop = 100,
-                wo = { winblend = 0 },
-            })
+        local cfg = require "opencode.config"
+        cfg.opts.provider.snacks.win = vim.tbl_deep_extend("force", cfg.opts.provider.snacks.win, {
+            position = "float",
+            border = "none",
+            width = 0,
+            height = 0,
+            enter = true,
+            backdrop = 100,
+            wo = { winblend = 0 },
+            bo = { scrollback = 0 },
+        })
 
         -- Clean up opencode when Neovim exits
         vim.api.nvim_create_autocmd("VimLeavePre", {

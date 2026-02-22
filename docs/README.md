@@ -7,7 +7,7 @@ A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim
 ## What's in it
 
 - **15+ language servers** auto-installed via Mason (Go, Python, TypeScript, Rust, C/C++, Elixir, PHP, Lua, Deno, Svelte, Gleam, Solidity, Tailwind, ESLint)
-- **AI coding** with Avante.nvim (Claude via OpenRouter)
+- **AI coding** with opencode.nvim (opencode CLI integration)
 - **Fuzzy everything** through Telescope with FZF-native sorting
 - **Fast completion** via blink.cmp (Rust-powered) with LSP, snippets, path, and buffer sources
 - **Format on save** with conform.nvim, **lint on save** with nvim-lint
@@ -27,13 +27,14 @@ A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim
 | Neovim 0.10+ | Native `vim.lsp.config`, `after/lsp/` support |
 | Nerd Font | Icons everywhere |
 | git | Plugins, Grapple scope |
-| make | telescope-fzf-native, LuaSnip, Avante builds |
+| make | telescope-fzf-native, LuaSnip builds |
 | ripgrep (`rg`) | Telescope live grep, todo-comments |
 | npm / Node.js | Markdown preview, some LSP servers |
 
 | Optional | Purpose |
 |---|---|
 | Lazygit | Git UI via `<leader>gg` |
+| opencode CLI | AI assistant via `<leader>aa` |
 | fd | Faster file finding for Telescope |
 | ImageMagick | SVG rendering in-editor |
 | Kitty terminal | Image protocol backend |
@@ -66,7 +67,7 @@ A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim
 │       ├── flash.lua            Label-based motion
 │       ├── oil.lua              Buffer-based file manager
 │       ├── undotree.lua         Undo history visualizer
-│       ├── avante.lua           AI assistant (Claude via OpenRouter)
+│       ├── opencode.lua         AI assistant (opencode CLI integration)
 │       ├── image.lua            In-editor image rendering
 │       ├── markdown-preview.lua Browser-based markdown preview
 │       ├── lang-rust.lua        rustaceanvim
@@ -187,9 +188,9 @@ init.lua
 |---|---|
 | `<leader>gs` | Git status (Fugitive) |
 | `<leader>gg` | Lazygit |
-| `<leader>aa` | Avante: toggle AI sidebar |
-| `<leader>an` | Avante: new chat |
-| `<leader>am` | Avante: switch model |
+| `<leader>aa` | opencode: toggle AI TUI |
+| `<leader>aa` (visual) | opencode: ask about selection |
+| `<leader>am` | opencode: menu |
 
 ### UI
 
@@ -270,7 +271,7 @@ nvim
 After first launch:
 1. Wait for the lazy.nvim install window to finish
 2. Run `:Mason` to verify LSP servers are installed
-3. (Optional) Set `OPENROUTER_API_KEY` in `~/.zshrc` for Avante AI
+3. (Optional) Install and configure the `opencode` CLI for AI features
 
 ---
 

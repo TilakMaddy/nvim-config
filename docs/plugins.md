@@ -43,10 +43,7 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 | `sainnhe/everforest` | UI & Appearance | Eager | `colorscheme.lua` |
 | `folke/snacks.nvim` | UI & Appearance | Eager (`lazy = false`, priority 1000) | `snacks.lua` |
 | `nvim-tree/nvim-web-devicons` | UI & Appearance | Dependency | `telescope.lua`, `navigation.lua` |
-| `yetone/avante.nvim` | AI | Cmd / keys | `avante.lua` |
-| `MunifTanjim/nui.nvim` | AI | Dependency of avante | `avante.lua` |
-| `HakonHarnes/img-clip.nvim` | AI | `VeryLazy` (dependency of avante) | `avante.lua` |
-| `MeanderingProgrammer/render-markdown.nvim` | AI | `ft = markdown, Avante` | `avante.lua` |
+| `nickjvandyke/opencode.nvim` | AI | Keys | `opencode.lua` |
 | `mrcjkb/rustaceanvim` | Language-Specific | Eager (`lazy = false`) | `lang-rust.lua` |
 | `elixir-tools/elixir-tools.nvim` | Language-Specific | `BufReadPre`, `BufNewFile` | `lang-elixir.lua` |
 | `ricardoramirezr/blade-nav.nvim` | Language-Specific | `ft = blade, php` | `lang-php.lua` |
@@ -661,65 +658,27 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 
 ## AI
 
-### `yetone/avante.nvim`
+### `nickjvandyke/opencode.nvim`
 
-- **GitHub:** [yetone/avante.nvim](https://github.com/yetone/avante.nvim)
-- **Purpose:** AI-powered coding assistant that provides a sidebar chat interface for code generation, editing, and discussion. Integrates with LLM providers for context-aware code help.
-- **Loading strategy:** Lazy-loaded on commands (`AvanteToggle`, `AvanteAsk`, `AvanteEdit`, `AvanteNewChat`, `AvanteModels`, `AvanteSwitchProvider`) and key mappings. Built with `make`.
-- **Dependencies:**
-  - `MunifTanjim/nui.nvim` -- UI component library for the sidebar interface.
-  - `HakonHarnes/img-clip.nvim` -- Image clipboard support (lazy-loaded on `VeryLazy`; configured with `embed_image_as_base64 = false` and drag-and-drop in insert mode).
-  - `MeanderingProgrammer/render-markdown.nvim` -- Rich markdown rendering for the chat interface (loaded on `ft = markdown, Avante`).
+- **GitHub:** [NickvanDyke/opencode.nvim](https://github.com/NickvanDyke/opencode.nvim)
+- **Purpose:** Integrates the [opencode](https://opencode.ai) CLI tool into Neovim. Shares editor context (buffers, selections, diagnostics) with the AI assistant and embeds the opencode TUI as a full-screen float.
+- **Loading strategy:** Lazy-loaded on key mappings. Pinned to latest stable (`version = "*"`).
+- **Dependencies:** `folke/snacks.nvim` (uses snacks.terminal for the embedded TUI).
 - **Key configuration choices:**
-  - Provider set to `openrouter` with the `anthropic/claude-sonnet-4` model.
-  - API key sourced dynamically from `~/.zshrc` via a shell command.
-  - Input prompt uses `snacks` provider (integrates with snacks.nvim's input UI).
-  - Custom `get_todos_container_height` override: reduces todo container to 5 lines when todos exist, 0 when empty.
+  - Uses the snacks provider to embed the opencode TUI as a floating terminal.
+  - Float window: 95% width/height, rounded border, opaque backdrop, auto-enter on toggle.
+  - Scrollback disabled (`scrollback = 0`) to prevent the terminal buffer from scrolling past the TUI.
+  - `VimLeavePre` autocmd calls `opencode.stop()` to clean up the server process on exit.
+  - Context placeholders (`@this`, `@buffer`, `@diagnostics`, etc.) inject editor state into prompts.
 - **Keybindings:**
 
   | Key | Mode | Description |
   |-----|------|-------------|
-  | `<leader>aa` | n | Toggle Avante sidebar (zen mode) |
-  | `<leader>aa` | v | Open Avante zen mode with selection |
-  | `<leader>an` | n | Start new chat (zen mode, logo visible) |
-  | `<leader>am` | n | Open model selector |
+  | `<leader>aa` | n, t | Toggle opencode TUI |
+  | `<leader>aa` | v | Ask opencode about visual selection |
+  | `<leader>am` | n | Open opencode menu (prompts, commands) |
 
----
-
-### `MunifTanjim/nui.nvim`
-
-- **GitHub:** [MunifTanjim/nui.nvim](https://github.com/MunifTanjim/nui.nvim)
-- **Purpose:** UI component library for Neovim plugins, providing popup, layout, input, and menu primitives. Used internally by avante.nvim.
-- **Loading strategy:** Loaded as a dependency of avante.nvim.
-- **Dependencies:** None.
-- **Key configuration choices:** None.
-- **Keybindings:** None.
-
----
-
-### `HakonHarnes/img-clip.nvim`
-
-- **GitHub:** [HakonHarnes/img-clip.nvim](https://github.com/HakonHarnes/img-clip.nvim)
-- **Purpose:** Paste images from clipboard or drag-and-drop into Neovim buffers. Used by avante.nvim for image context in AI conversations.
-- **Loading strategy:** Lazy-loaded on `VeryLazy` as a dependency of avante.nvim.
-- **Dependencies:** None.
-- **Key configuration choices:**
-  - `embed_image_as_base64 = false` -- stores images as files rather than inlining base64.
-  - `prompt_for_file_name = false` -- auto-generates file names.
-  - `drag_and_drop.insert_mode = true` -- supports drag-and-drop in insert mode.
-- **Keybindings:** None.
-
----
-
-### `MeanderingProgrammer/render-markdown.nvim`
-
-- **GitHub:** [MeanderingProgrammer/render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)
-- **Purpose:** Renders markdown with rich formatting (headings, code blocks, lists, checkboxes) directly in the Neovim buffer. Used for both regular markdown files and the Avante chat interface.
-- **Loading strategy:** Lazy-loaded on filetypes `markdown` and `Avante`.
-- **Dependencies:** None.
-- **Key configuration choices:**
-  - `file_types = { "markdown", "Avante" }` -- activated for both standard markdown and the Avante sidebar filetype.
-- **Keybindings:** None.
+- **Prerequisite:** The `opencode` CLI must be installed and configured separately (provider/API key setup is done in opencode's own config, not in Neovim).
 
 ---
 

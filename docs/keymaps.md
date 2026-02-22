@@ -236,19 +236,19 @@ These are group labels shown by which-key; they do not perform an action themsel
 | `<leader>w`  | `n`        | [W]orkspace   |
 | `<leader>t`  | `n`        | [T]oggle      |
 | `<leader>h`  | `n`, `v`   | [G]rapple     |
+| `<leader>a`  | `n`, `v`   | [A]I          |
 
 ---
 
-## 12. AI (Avante)
+## 12. AI (opencode.nvim)
 
-From `lua/plugins/avante.lua`. Uses OpenRouter (Claude Sonnet 4) as the AI backend.
+From `lua/plugins/opencode.lua`. Integrates the [opencode](https://opencode.ai) CLI tool into Neovim.
 
-| Keymap         | Mode | Action                                           | Description                                    |
-|----------------|------|--------------------------------------------------|------------------------------------------------|
-| `<leader>aa`   | `n`  | Toggle Avante sidebar (open zen / close sidebar) | Toggle Avante AI sidebar in zen mode           |
-| `<leader>aa`   | `v`  | `avante.api.zen_mode()`                          | Open Avante zen mode with visual selection     |
-| `<leader>an`   | `n`  | `avante.api.ask({ new_chat = true })`            | Start a new Avante chat in zen mode            |
-| `<leader>am`   | `n`  | `:AvanteModels`                                  | Switch Avante AI model                         |
+| Keymap         | Mode   | Action                                           | Description                                    |
+|----------------|--------|--------------------------------------------------|------------------------------------------------|
+| `<leader>aa`   | `n`, `t` | `opencode.toggle()`                           | Toggle opencode TUI (full-screen float)        |
+| `<leader>aa`   | `v`    | `opencode.ask("@this: ", { submit = true })`    | Ask opencode about visual selection            |
+| `<leader>am`   | `n`    | `opencode.select()`                              | Open opencode menu (prompts, commands, etc.)   |
 
 ---
 
@@ -305,7 +305,7 @@ From `lua/plugins/mini.lua` via `mini.surround` with default mappings.
 | Treesitter move   | `]` / `[` + key       | `]f` next function, `[c` prev class     |
 | Treesitter swap   | `<leader>x` + key     | `<leader>xa` swap next arg              |
 | UI                | `<leader>t` + key     | `<leader>tt` theme, `<leader>th` hints  |
-| AI                | `<leader>a` + key     | `<leader>aa` avante, `<leader>an` new   |
+| AI                | `<leader>a` + key     | `<leader>aa` toggle, `<leader>am` menu  |
 | Surround          | `s` + `a`/`d`/`r`    | `sa` add, `sd` delete, `sr` replace     |
 | Window            | `<C-h/j/k/l>`        | Move focus between splits               |
 | Terminal          | `<C-\>`               | Toggle floating terminal                |
