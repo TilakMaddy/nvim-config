@@ -23,6 +23,8 @@ return {
         },
         bigfile = { enabled = true },
         picker = {
+            enabled = true,
+            ui_select = true,
             actions = {
                 opencode_send = function(...)
                     return require("opencode").snacks_picker_send(...)

@@ -87,6 +87,7 @@ return {
                 "tailwindcss-language-server",
                 "eslint-lsp",
                 "phpactor",
+                "expert",
                 -- Formatters
                 "stylua",
                 "clang-format",
