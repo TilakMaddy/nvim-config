@@ -23,6 +23,7 @@ vim.opt.termguicolors = true
 vim.opt.cursorline = true
 vim.opt.signcolumn = "yes"
 vim.opt.showmode = false
+vim.opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25"
 vim.opt.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 vim.opt.scrolloff = 10
