@@ -53,14 +53,19 @@ vim.api.nvim_create_autocmd("VimEnter", {
     end,
 })
 
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  },
-}
+-- In an SSH Session, usually you don't have a display device attached. So the bytes need to be printed
+-- to console for the host to copy them.
+
+if vim.env.SSH_TTY then
+    vim.g.clipboard = {
+        name = "OSC 52",
+        copy = {
+            ["+"] = require("vim.ui.clipboard.osc52").copy "+",
+            ["*"] = require("vim.ui.clipboard.osc52").copy "*",
+        },
+        paste = {
+            ["+"] = require("vim.ui.clipboard.osc52").paste "+",
+            ["*"] = require("vim.ui.clipboard.osc52").paste "*",
+        },
+    }
+end
