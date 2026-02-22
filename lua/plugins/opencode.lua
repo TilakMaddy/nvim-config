@@ -30,30 +30,18 @@ return {
                 backdrop = 100,
                 wo = { winblend = 0 },
             })
+
+        -- Clean up opencode when Neovim exits
+        vim.api.nvim_create_autocmd("VimLeavePre", {
+            callback = function()
+                pcall(require("opencode").stop)
+            end,
+        })
     end,
+    -- stylua: ignore
     keys = {
-        {
-            "<leader>aa",
-            function()
-                require("opencode").toggle()
-            end,
-            desc = "AI Toggle",
-            mode = { "n", "t" },
-        },
-        {
-            "<leader>aa",
-            function()
-                require("opencode").ask "@this: "
-            end,
-            mode = "v",
-            desc = "AI Ask (selection)",
-        },
-        {
-            "<leader>am",
-            function()
-                require("opencode").select()
-            end,
-            desc = "AI Menu",
-        },
+        { "<leader>aa", function() require("opencode").toggle() end, desc = "AI Toggle", mode = { "n", "t" } },
+        { "<leader>aa", function() require("opencode").ask("@this: ", { submit = true }) end, mode = "v", desc = "AI Ask (selection)" },
+        { "<leader>am", function() require("opencode").select() end, desc = "AI Menu" },
     },
 }
