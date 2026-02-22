@@ -45,6 +45,9 @@ return {
                 filtered_items = {
                     hide_dotfiles = false,
                     hide_gitignored = false,
+                    hide_by_name = {
+                        ".git",
+                    },
                 },
                 follow_current_file = { enabled = true },
                 window = {
