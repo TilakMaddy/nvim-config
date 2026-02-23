@@ -52,6 +52,12 @@ return {
                 follow_current_file = { enabled = true },
                 window = {
                     mappings = {
+                        ["O"] = function(state)
+                            local node = state.tree:get_node()
+                            local path = node:get_id()
+                            path = vim.fn.fnamemodify(path, ":h")
+                            vim.fn.system({ "open", path })
+                        end,
                         ["H"] = "toggle_hidden",
                         ["I"] = function(state)
                             local fi = state.filtered_items
