@@ -11,6 +11,7 @@ return {
             end,
         },
         { "nvim-tree/nvim-web-devicons", enabled = vim.g.nerd_font },
+        { "nvim-telescope/telescope-live-grep-args.nvim", version = "^1.0.0" },
     },
     keys = {
         { "<leader>sh", "<cmd>Telescope help_tags<cr>", desc = "[S]earch [H]elp" },
@@ -19,7 +20,13 @@ return {
         { "<leader>sf", "<cmd>Telescope git_files<cr>", desc = "[S]earch Git [F]iles" },
         { "<leader>ss", "<cmd>Telescope builtin<cr>", desc = "[S]earch [S]elect Telescope" },
         { "<leader>sw", "<cmd>Telescope grep_string<cr>", desc = "[S]earch current [W]ord" },
-        { "<leader>sg", "<cmd>Telescope live_grep<cr>", desc = "[S]earch by [G]rep" },
+        {
+            "<leader>sg",
+            function()
+                require("telescope").extensions.live_grep_args.live_grep_args()
+            end,
+            desc = "[S]earch by [G]rep (with args)",
+        },
         {
             "<leader>sG",
             function()
@@ -32,7 +39,7 @@ return {
             function()
                 vim.ui.input({ prompt = "Directory: " }, function(dir)
                     if dir and dir ~= "" then
-                        require("telescope.builtin").live_grep { search_dirs = { dir } }
+                        require("telescope").extensions.live_grep_args.live_grep_args { search_dirs = { dir } }
                     end
                 end)
             end,
@@ -85,10 +92,21 @@ return {
                     override_file_sorter = true,
                     case_mode = "smart_case",
                 },
+                live_grep_args = {
+                    auto_quoting = true,
+                    mappings = {
+                        i = {
+                            ["<C-k>"] = require("telescope-live-grep-args.actions").quote_prompt(),
+                            ["<C-i>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " --iglob " },
+                            ["<C-t>"] = require("telescope-live-grep-args.actions").quote_prompt { postfix = " -t " },
+                        },
+                    },
+                },
             },
         }
 
         pcall(require("telescope").load_extension, "fzf")
+        pcall(require("telescope").load_extension, "live_grep_args")
         -- These keymaps need function wrappers so they stay here
         local builtin = require "telescope.builtin"
         vim.keymap.set("n", "<leader>/", function()
