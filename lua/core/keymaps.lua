@@ -8,6 +8,17 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 vim.keymap.set("n", "<leader>pd", vim.diagnostic.open_float, { desc = "Popup Diagnostics" })
 
+-- Copy file path
+vim.keymap.set("n", "<leader>cp", function()
+    local path = vim.fn.expand "%:p"
+    vim.ui.input({ prompt = "Copy path: ", default = path }, function(val)
+        if val and val ~= "" then
+            vim.fn.setreg("+", val)
+            vim.notify("Copied: " .. val, vim.log.levels.INFO)
+        end
+    end)
+end, { desc = "[C]opy file [P]ath" })
+
 -- Exit terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
