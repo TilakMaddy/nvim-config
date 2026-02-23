@@ -23,6 +23,7 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 | `folke/todo-comments.nvim` | Syntax & Code Intelligence | `BufReadPost`, `BufNewFile` | `editor.lua` |
 | `nvim-telescope/telescope.nvim` | Search & Navigation | `Telescope` cmd / keys | `telescope.lua` |
 | `nvim-telescope/telescope-fzf-native.nvim` | Search & Navigation | Dependency | `telescope.lua` |
+| `nvim-telescope/telescope-live-grep-args.nvim` | Search & Navigation | Dependency | `telescope.lua` |
 | `nvim-tree/nvim-tree.lua` | Search & Navigation | `NvimTreeToggle` / `NvimTreeFindFile` cmd / keys | `navigation.lua` |
 | `cbochs/grapple.nvim` | Search & Navigation | Keys | `navigation.lua` |
 | `stevearc/oil.nvim` | Search & Navigation | `Oil` cmd / keys | `oil.lua` |
@@ -292,12 +293,14 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
   - `nvim-lua/plenary.nvim`
   - `nvim-telescope/telescope-fzf-native.nvim` (conditional on `make` being available)
   - `nvim-tree/nvim-web-devicons` (conditional on `vim.g.nerd_font`)
+  - `nvim-telescope/telescope-live-grep-args.nvim` (enables rg flags in live grep prompt)
 - **Key configuration choices:**
   - `file_ignore_patterns` excludes `node_modules/`, `.git/`, `*.lock`, `dist/`, `build/`, `target/`, `vendor/`, and `*.min.js` for faster searches.
   - `sorting_strategy = "ascending"` with `prompt_position = "top"` for a top-down layout.
   - `path_display = { "truncate" }` to keep results readable.
   - Preview limited to files under 1MB with a 250ms timeout.
   - FZF extension loaded with smart_case and overrides for both generic and file sorters.
+  - `live_grep_args` extension loaded with `auto_quoting = true` and insert-mode shortcuts: `Ctrl+k` (quote prompt), `Ctrl+t` (quote + `-t ` type filter), `Ctrl+i` (quote + `--iglob ` glob filter).
 - **Keybindings:**
 
   | Key | Mode | Description |
@@ -308,9 +311,9 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
   | `<leader>sf` | n | Search git files |
   | `<leader>ss` | n | Search Telescope builtins |
   | `<leader>sw` | n | Search current word (grep_string) |
-  | `<leader>sg` | n | Search by grep (live_grep) |
+  | `<leader>sg` | n | Search by grep (live_grep_args — supports rg flags like `-tlua`, `--iglob`) |
   | `<leader>sG` | n | Search by grep (include ignored/hidden) |
-  | `<leader>sD` | n | Search directory (scoped grep) |
+  | `<leader>sD` | n | Search directory (scoped grep with rg arg support) |
   | `<leader>sd` | n | Search diagnostics (vertical layout) |
   | `<leader>sr` | n | Resume last search |
   | `<leader>s.` | n | Search recent files |
@@ -331,6 +334,22 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 - **Key configuration choices:**
   - `fuzzy = true`, `override_generic_sorter = true`, `override_file_sorter = true`, `case_mode = "smart_case"`.
 - **Keybindings:** None.
+
+---
+
+### `nvim-telescope/telescope-live-grep-args.nvim`
+
+- **GitHub:** [nvim-telescope/telescope-live-grep-args.nvim](https://github.com/nvim-telescope/telescope-live-grep-args.nvim)
+- **Purpose:** Telescope extension that allows passing ripgrep arguments directly in the live grep prompt, enabling file type filtering (`-tlua`), glob patterns (`--iglob *.py`), and other rg flags without leaving the picker.
+- **Loading strategy:** Loaded as a dependency of telescope.nvim. Pinned to version `^1.0.0`.
+- **Dependencies:** `telescope.nvim`.
+- **Key configuration choices:**
+  - `auto_quoting = true` -- automatically quotes the search term so rg flags are parsed correctly.
+  - Insert-mode mappings inside the picker:
+    - `Ctrl+k` -- quote the prompt (general purpose).
+    - `Ctrl+t` -- quote the prompt + append `-t ` for file type filtering.
+    - `Ctrl+i` -- quote the prompt + append `--iglob ` for glob filtering.
+- **Keybindings:** None directly (used via `<leader>sg` and `<leader>sD`).
 
 ---
 

@@ -50,6 +50,7 @@ Telescope is the primary search interface. It uses `fd` for file listing and `ri
 | Extension | Purpose |
 |---|---|
 | `telescope-fzf-native.nvim` | Compiled FZF algorithm for fast, accurate fuzzy matching. Overrides both the generic and file sorters. Only loaded if `make` is available on the system. |
+| `telescope-live-grep-args.nvim` | Enables passing ripgrep arguments (file type filters, globs, flags) directly in the live grep prompt. Powers `<leader>sg` and `<leader>sD`. |
 
 ### Keybindings
 
@@ -60,9 +61,9 @@ All Telescope keybindings use the `<leader>s` prefix (mnemonic: **S**earch), exc
 | `<leader>sf` | `Telescope git_files` | Search files tracked by Git (fast, skips ignored files) |
 | `<leader>saf` | `Telescope find_files` | Search ALL files in the working directory (includes untracked) |
 | `<leader>sF` | `find_files` with directory prompt | Prompts for a directory, then searches files within it |
-| `<leader>sg` | `Telescope live_grep` | Live grep across the project (respects ignore patterns) |
+| `<leader>sg` | `live_grep_args` | Live grep with ripgrep arg support (type filters, globs). See [Grep Args](#grep-args-usage) below. |
 | `<leader>sG` | `live_grep` with `--no-ignore --hidden` | Live grep including hidden and ignored files |
-| `<leader>sD` | `live_grep` with directory prompt | Prompts for a directory, then greps within it |
+| `<leader>sD` | `live_grep_args` with directory prompt | Prompts for a directory, then greps within it (supports rg args) |
 | `<leader>sw` | `Telescope grep_string` | Grep for the word currently under the cursor |
 | `<leader>sd` | `Telescope diagnostics` | Search LSP diagnostics (vertical layout, large preview) |
 | `<leader>sh` | `Telescope help_tags` | Search Neovim help tags |
@@ -75,6 +76,47 @@ All Telescope keybindings use the `<leader>s` prefix (mnemonic: **S**earch), exc
 | `<leader>/` | `current_buffer_fuzzy_find` | Fuzzy search inside the current buffer (dropdown, no preview) |
 | `<leader><leader>` | `Telescope buffers` | Find and switch between open buffers |
 
+### Grep Args Usage
+
+`<leader>sg` and `<leader>sD` use [telescope-live-grep-args](https://github.com/nvim-telescope/telescope-live-grep-args.nvim), which lets you pass ripgrep flags directly in the search prompt. `auto_quoting` is enabled, so your search term is automatically quoted.
+
+**Picker shortcuts (insert mode):**
+
+| Key | Action |
+|---|---|
+| `Ctrl+k` | Quote the search term (general purpose, for manually appending any rg flag) |
+| `Ctrl+t` | Quote the search term + append `-t ` (file **t**ype filter) |
+| `Ctrl+i` | Quote the search term + append `--iglob ` (case-insensitive **g**lob filter) |
+
+**Example workflow — search `pr` in only Lua files:**
+
+1. Press `<leader>sg`
+2. Type `pr`
+3. Press `Ctrl+t`
+4. Type `lua`
+5. The prompt now reads `"pr" -t lua` — only Lua files are shown
+
+**Common rg flag examples:**
+
+| Prompt | Effect |
+|---|---|
+| `"search_term" -tlua` | Only Lua files |
+| `"search_term" -tpy` | Only Python files |
+| `"search_term" --iglob *.lua` | Glob: only `.lua` files |
+| `"search_term" --iglob !*.md` | Glob: exclude markdown files |
+| `"search_term" -g "lua/plugins/*.lua"` | Glob: only `.lua` files under `lua/plugins/` |
+| `"search_term" --no-ignore` | Include files ignored by `.gitignore` |
+
+**Glob pattern reference:**
+
+| Pattern | Matches |
+|---|---|
+| `*` | Anything within one directory level |
+| `**` | Anything across all directory levels |
+| `?` | Single character |
+| `{a,b}` | Either `a` or `b` |
+| `!pattern` | Exclude files matching the pattern |
+
 ### Tips
 
 - **Use `<leader>sf` (git files) as your default file finder.** It is faster than `<leader>saf` because it only searches files tracked by Git, skipping `node_modules`, build artifacts, and other ignored paths.
@@ -82,6 +124,7 @@ All Telescope keybindings use the `<leader>s` prefix (mnemonic: **S**earch), exc
 - **Use `<leader>sG` when you need to search through vendored or generated code** that is normally ignored by ripgrep.
 - **Use `<leader>sr` (resume) to get back to your last search** without retyping the query -- especially useful after opening a result and wanting to continue browsing.
 - **Use `<leader>sD` to scope a grep to a specific subdirectory** when the project is large and you know where to look.
+- **Use `Ctrl+t` in the grep picker** to quickly filter by file type without manually typing quotes and flags.
 
 ---
 
@@ -309,8 +352,10 @@ Standard window/split navigation using Ctrl + hjkl, matching Vim's directional c
 ### Searching for a string across the project
 1. Press `<leader>sg` to start a live grep.
 2. Type the search term. Results update as you type.
-3. To include `node_modules` or hidden files, use `<leader>sG` instead.
-4. To scope to a specific directory, use `<leader>sD`.
+3. To filter by file type, press `Ctrl+t` then type the type (e.g., `lua`, `py`).
+4. To filter by glob, press `Ctrl+i` then type the pattern (e.g., `*.lua`, `!*.md`).
+5. To include `node_modules` or hidden files, use `<leader>sG` instead.
+6. To scope to a specific directory, use `<leader>sD`.
 
 ### Working on a fixed set of files
 1. Open each file you will be working on.

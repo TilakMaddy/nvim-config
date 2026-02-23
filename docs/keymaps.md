@@ -43,9 +43,9 @@ All search-related keymaps from `lua/plugins/telescope.lua`. Every binding uses 
 | `<leader>sf`        | `n`  | `Telescope git_files`                         | Search Git Files                                    |
 | `<leader>ss`        | `n`  | `Telescope builtin`                           | Search Select Telescope (list all pickers)          |
 | `<leader>sw`        | `n`  | `Telescope grep_string`                       | Search current Word under cursor                    |
-| `<leader>sg`        | `n`  | `Telescope live_grep`                         | Search by Grep (live)                               |
+| `<leader>sg`        | `n`  | `live_grep_args`                              | Search by Grep with rg arg support (`Ctrl+t` for type, `Ctrl+i` for glob) |
 | `<leader>sG`        | `n`  | `Telescope live_grep` (no-ignore, hidden)     | Search by Grep including ignored and hidden files   |
-| `<leader>sD`        | `n`  | `Telescope live_grep` (scoped to directory)   | Search Directory -- prompts for a directory, then greps within it |
+| `<leader>sD`        | `n`  | `live_grep_args` (scoped to directory)        | Search Directory -- prompts for a directory, then greps with rg arg support |
 | `<leader>sd`        | `n`  | `Telescope diagnostics`                       | Search Diagnostics (vertical layout)                |
 | `<leader>sr`        | `n`  | `Telescope resume`                            | Search Resume (reopen last picker)                  |
 | `<leader>s.`        | `n`  | `Telescope oldfiles`                          | Search Recent Files                                 |
