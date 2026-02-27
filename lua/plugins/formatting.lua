@@ -31,6 +31,8 @@ return {
             lua = { "stylua" },
             ["c++"] = { "clang-format" },
             cpp = { "clang-format" },
+            json = { "prettierd", "prettier", stop_after_first = true },
+            jsonc = { "prettierd", "prettier", stop_after_first = true },
             javascript = { "prettierd", "prettier", stop_after_first = true },
             typescript = { "prettierd", "prettier", stop_after_first = true },
             php = { "pint", "php_cs_fixer", stop_after_first = true },
