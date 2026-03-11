@@ -88,6 +88,7 @@ return {
                 "eslint-lsp",
                 "phpactor",
                 "expert",
+                "terraform-ls",
                 -- Formatters
                 "stylua",
                 "clang-format",
@@ -95,6 +96,7 @@ return {
                 -- Linters
                 "ruff",
                 "golangci-lint",
+                "tflint",
             },
         }
 

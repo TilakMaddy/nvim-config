@@ -7,6 +7,7 @@ return {
         lint.linters_by_ft = {
             python = { "ruff" },
             go = { "golangcilint" },
+            terraform = { "tflint" },
         }
 
         vim.api.nvim_create_autocmd({ "BufWritePost", "InsertLeave", "BufReadPost" }, {
