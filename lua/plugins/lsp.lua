@@ -79,7 +79,7 @@ return {
             ensure_installed = {
                 -- LSP servers
                 "lua-language-server",
-                "gopls",
+                { "gopls", version = "v0.24.0" },
                 "pyright",
                 "typescript-language-server",
                 "deno",
@@ -97,6 +97,8 @@ return {
                 "ruff",
                 "golangci-lint",
                 "tflint",
+                -- Debuggers
+                "delve",
             },
         }
 

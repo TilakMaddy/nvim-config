@@ -43,12 +43,20 @@ require("lazy").setup {
     },
 }
 
--- Start at the path specified in arguments
+-- Start at the path specified in arguments, restoring that directory's last session
 vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
         local arg = vim.fn.argv(0)
         if arg ~= "" and vim.fn.isdirectory(arg) == 1 then
+            local dir_buf = vim.api.nvim_get_current_buf()
             vim.cmd.cd(arg)
+            -- Load outside the autocmd so restored buffers fire FileType (LSP, treesitter)
+            vim.schedule(function()
+                require("persistence").load()
+                if vim.api.nvim_buf_is_valid(dir_buf) and vim.api.nvim_get_current_buf() ~= dir_buf then
+                    vim.api.nvim_buf_delete(dir_buf, { force = true })
+                end
+            end)
         end
     end,
 })

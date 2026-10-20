@@ -17,37 +17,67 @@ return {
             end
         end
 
-        require("nvim-treesitter").setup {
-            ensure_installed = {
-                "bash",
-                "c",
-                "cpp",
-                "css",
-                "diff",
-                "elixir",
-                "go",
-                "hcl",
-                "html",
-                "javascript",
-                "json",
-                "lua",
-                "luadoc",
-                "markdown",
-                "markdown_inline",
-                "php",
-                "python",
-                "query",
-                "rust",
-                "svelte",
-                "terraform",
-                "typescript",
-                "vim",
-                "vimdoc",
-            },
-            auto_install = true,
-            highlight = { enable = true },
-            indent = { enable = true },
+        -- main branch: install() is async and skips already-installed parsers
+        require("nvim-treesitter").install {
+            "bash",
+            "c",
+            "cpp",
+            "css",
+            "diff",
+            "elixir",
+            "go",
+            "hcl",
+            "html",
+            "javascript",
+            "json",
+            "lua",
+            "luadoc",
+            "markdown",
+            "markdown_inline",
+            "php",
+            "python",
+            "query",
+            "rust",
+            "svelte",
+            "terraform",
+            "typescript",
+            "vim",
+            "vimdoc",
         }
+
+        -- main branch has no highlight/indent modules; start treesitter per buffer
+        local function start(buf)
+            if pcall(vim.treesitter.start, buf) then
+                vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+            end
+        end
+
+        -- main branch also dropped auto_install; install missing parsers on first use
+        local available = {}
+        for _, lang in ipairs(require("nvim-treesitter").get_available()) do
+            available[lang] = true
+        end
+
+        vim.api.nvim_create_autocmd("FileType", {
+            group = vim.api.nvim_create_augroup("treesitter-start", { clear = true }),
+            callback = function(args)
+                local lang = vim.treesitter.language.get_lang(args.match)
+                if lang and available[lang] and not vim.list_contains(require("nvim-treesitter").get_installed "parsers", lang) then
+                    require("nvim-treesitter").install(lang):await(function(err)
+                        if err then
+                            return
+                        end
+                        vim.schedule(function()
+                            if vim.api.nvim_buf_is_valid(args.buf) then
+                                start(args.buf)
+                            end
+                        end)
+                    end)
+                    return
+                end
+                start(args.buf)
+            end,
+        })
 
         -- Textobjects config (standalone plugin, not via nvim-treesitter.setup)
         require("nvim-treesitter-textobjects").setup {
