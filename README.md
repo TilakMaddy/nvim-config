@@ -23,7 +23,7 @@ mv ~/.config/nvim ~/.config/nvim.bak
 mv ~/.local/share/nvim ~/.local/share/nvim.bak
 
 # Clone
-git clone https://github.com/<your-username>/nvim-config.git ~/.config/nvim
+git clone https://github.com/TilakMaddy/nvim-config.git ~/.config/nvim
 
 # Launch -- lazy.nvim handles the rest
 nvim
