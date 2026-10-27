@@ -89,6 +89,7 @@ return {
                 "phpactor",
                 "expert",
                 "terraform-ls",
+                "yaml-language-server",
                 -- Formatters
                 "stylua",
                 "clang-format",
