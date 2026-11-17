@@ -33,7 +33,7 @@ nvim
 
 **Required:** Neovim 0.10+, Nerd Font, git, make, ripgrep, npm/Node.js
 
-**Optional:** [Lazygit](https://github.com/jesseduffield/lazygit), fd, ImageMagick, Kitty terminal
+**Optional:** [Lazygit](https://github.com/jesseduffield/lazygit), fd, ImageMagick, librsvg (SVG previews: `brew install librsvg`), Kitty terminal
 
 ### Post-install
 
@@ -59,6 +59,7 @@ Leader is **Space**. Press it and wait for which-key to show options.
 | `<leader>aa` | Toggle AI sidebar |
 | `<leader>gg` | Lazygit |
 | `<leader>tt` | Theme picker |
+| `<leader>i` | Toggle SVG preview / source (SVG buffers) |
 | `<C-\>` | Floating terminal |
 | `s` | Flash jump |
 

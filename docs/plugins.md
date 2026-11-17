@@ -48,7 +48,7 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 | `mrcjkb/rustaceanvim` | Language-Specific | Eager (`lazy = false`) | `lang-rust.lua` |
 | `elixir-tools/elixir-tools.nvim` | Language-Specific | `BufReadPre`, `BufNewFile` | `lang-elixir.lua` |
 | `ricardoramirezr/blade-nav.nvim` | Language-Specific | `ft = blade, php` | `lang-php.lua` |
-| `3rd/image.nvim` | Media & Preview | `VeryLazy` | `image.lua` |
+| `3rd/image.nvim` | Media & Preview | Eager (`lazy = false`) | `image.lua` |
 | `iamcco/markdown-preview.nvim` | Media & Preview | `ft = markdown` / cmd / keys | `markdown-preview.lua` |
 
 ---
@@ -752,17 +752,21 @@ Complete reference for every plugin in this Neovim configuration. All plugins ar
 
 - **GitHub:** [3rd/image.nvim](https://github.com/3rd/image.nvim)
 - **Purpose:** Displays images directly inside the Neovim terminal using the Kitty graphics protocol. Supports inline image rendering in markdown files and direct image file viewing.
-- **Loading strategy:** Lazy-loaded on `VeryLazy`. Build is disabled (`build = false`).
-- **Dependencies:** None (requires Kitty terminal and ImageMagick externally).
+- **Loading strategy:** Loaded eagerly (`lazy = false`) so files opened from the command line (`nvim foo.png`) are hijacked. Build is disabled (`build = false`).
+- **Dependencies:** None (requires a Kitty-graphics-capable terminal, ImageMagick, and librsvg externally).
 - **Key configuration choices:**
   - `backend = "kitty"` -- uses the Kitty terminal graphics protocol.
   - `processor = "magick_cli"` -- uses the ImageMagick CLI for image processing.
-  - Hijacks file patterns: `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.avif`, `*.svg`.
+  - Hijacks file patterns: `*.png`, `*.jpg`, `*.jpeg`, `*.gif`, `*.webp`, `*.avif`.
   - `max_height_window_percentage = 50` -- images take at most half the window height.
   - `window_overlap_clear_enabled = true` -- clears images when windows overlap.
   - Markdown integration enabled with remote image downloading.
-  - Custom SVG support: intercepts `*.svg` / `*.svgz` files via `BufReadCmd`, converts to PNG using ImageMagick at 300 DPI with transparent background, and displays the result. Temporary PNG files are cleaned up on buffer close.
-- **Keybindings:** None.
+  - Custom SVG support: `*.svg` / `*.svgz` buffers are rendered to PNG with `rsvg-convert` at 2x zoom (ImageMagick's built-in SVG renderer fails on text), cached in `stdpath("cache")/image-svg/` keyed by path + mtime + size, and shown in the SVG's own buffer via `hijack_buffer`.
+- **Keybindings:**
+
+  | Key | Mode | Description |
+  |-----|------|-------------|
+  | `<leader>i` | n | Toggle SVG preview / source (SVG buffers only; saves before re-rendering) |
 
 ---
 

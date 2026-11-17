@@ -16,7 +16,7 @@ A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim
 - **Flash.nvim** for label-based cursor jumping
 - **Treesitter** syntax, textobjects, and structural navigation
 - **Floating terminal**, **Lazygit**, and **notification system** via snacks.nvim
-- **In-editor images** via Kitty protocol + ImageMagick
+- **In-editor images** via Kitty protocol + ImageMagick, with SVG preview/source toggle (`<leader>i`)
 
 ---
 
@@ -36,7 +36,8 @@ A modular Neovim configuration built on [kickstart.nvim](https://github.com/nvim
 | Lazygit | Git UI via `<leader>gg` |
 | opencode CLI | AI assistant via `<leader>aa` |
 | fd | Faster file finding for Telescope |
-| ImageMagick | SVG rendering in-editor |
+| ImageMagick | Image processing for in-editor images |
+| librsvg (`rsvg-convert`) | SVG rendering in-editor (`brew install librsvg`) |
 | Kitty terminal | Image protocol backend |
 
 ---

@@ -262,7 +262,17 @@ From `lua/plugins/markdown-preview.lua`.
 
 ---
 
-## 14. Elixir
+## 14. Images (image.nvim)
+
+From `lua/plugins/image.lua`. SVGs open as a rendered preview (via `rsvg-convert`; needs `brew install librsvg`). This keymap is buffer-local to `*.svg` / `*.svgz` buffers.
+
+| Keymap         | Mode | Action                         | Description                                                        |
+|----------------|------|--------------------------------|--------------------------------------------------------------------|
+| `<leader>i`    | `n`  | Toggle SVG preview / source    | Switch between rendered image and editable XML (saves before re-rendering) |
+
+---
+
+## 15. Elixir
 
 From `lua/plugins/lang-elixir.lua`. These keymaps are buffer-local and only active when ElixirLS is attached.
 
@@ -274,7 +284,7 @@ From `lua/plugins/lang-elixir.lua`. These keymaps are buffer-local and only acti
 
 ---
 
-## 15. Mini.surround
+## 16. Mini.surround
 
 From `lua/plugins/mini.lua` via `mini.surround` with default mappings.
 

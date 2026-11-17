@@ -376,7 +376,7 @@ Renders images directly inside the Neovim terminal using the Kitty graphics prot
 opts = {
     backend = "kitty",
     processor = "magick_cli",
-    hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif", "*.svg" },
+    hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" },
     max_height_window_percentage = 50,
     window_overlap_clear_enabled = true,
     integrations = {
@@ -393,7 +393,7 @@ opts = {
 |---------|-------|-------------|
 | `backend` | `"kitty"` | Uses the Kitty terminal graphics protocol for rendering |
 | `processor` | `"magick_cli"` | Uses the ImageMagick CLI (`magick` command) for image processing |
-| `hijack_file_patterns` | PNG, JPG, JPEG, GIF, WEBP, AVIF, SVG | Opening any of these file types displays the image instead of raw binary |
+| `hijack_file_patterns` | PNG, JPG, JPEG, GIF, WEBP, AVIF | Opening any of these file types displays the image instead of raw binary (SVGs are handled separately, below) |
 | `max_height_window_percentage` | `50` | Images are capped at 50% of the window height |
 | `window_overlap_clear_enabled` | `true` | Clears images when windows overlap them |
 
@@ -405,18 +405,21 @@ opts = {
 
 ### SVG support
 
-A custom `BufReadCmd` autocmd handles SVG files:
+SVGs are handled by a custom autocmd in `image.lua` rather than image.nvim's own hijack, because ImageMagick's built-in SVG renderer fails on SVGs containing text:
 
-1. When an SVG file is opened, ImageMagick converts it to a temporary PNG at 300 DPI with a transparent background.
-2. The converted PNG is loaded into the buffer for display.
-3. The temporary PNG is cleaned up automatically when the buffer is deleted.
+1. On `BufWinEnter` / `WinNew` / `TabEnter` for `*.svg` / `*.svgz`, the file is rasterized with `rsvg-convert --zoom 2`.
+2. The PNG is cached in `stdpath("cache")/image-svg/`, keyed by path + mtime + size, so reopening an unchanged file is instant.
+3. The PNG is displayed in the SVG's own buffer via `require("image").hijack_buffer()`.
 
-If the conversion fails, an error notification is shown.
+If `rsvg-convert` is missing, a warning is shown; if rendering fails, an error notification is shown.
+
+**Editing SVGs:** press `<leader>i` in an SVG buffer to toggle between the rendered preview and the editable source. Toggling back to the preview saves the file first so the render reflects your edits. A buffer stays in source mode until toggled back.
 
 ### Requirements
 
 - **Kitty terminal** (or any terminal supporting the Kitty graphics protocol).
 - **ImageMagick** must be installed and available as the `magick` command on your `$PATH`.
+- **librsvg** (`brew install librsvg`) for SVG rendering via `rsvg-convert`.
 
 ---
 
