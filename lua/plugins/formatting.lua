@@ -35,6 +35,8 @@ return {
             jsonc = { "prettierd", "prettier", stop_after_first = true },
             javascript = { "prettierd", "prettier", stop_after_first = true },
             typescript = { "prettierd", "prettier", stop_after_first = true },
+            typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+            javascriptreact = { "prettierd", "prettier", stop_after_first = true },
             php = { "pint", "php_cs_fixer", stop_after_first = true },
         },
     },
